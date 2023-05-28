@@ -8,8 +8,13 @@ import { Navigate } from "react-router-dom";
 import Header from "../Components/Welcome/Header";
 
 // Styled Components
-import { InputContainer, PrimaryBtn } from "../Components/Feed/Styles/FormPageStyled.js";
-import { LinkBtn, GoogleBtn, Divider } from "../Components/Feed/Styles/RegisterStyled.js";
+import {
+  InputContainer,
+  PrimaryBtn,
+  LinkBtn,
+  GoogleBtn,
+  Divider,
+} from "../Components/Feed/Styles/RegisterStyled.js";
 
 // ENV
 import { API } from "../env";
@@ -17,18 +22,17 @@ import { API } from "../env";
 const Register = () => {
   const dispatch = useDispatch();
 
-  // user-info - for checking if the user not logged in
+  // user-info - for checking if the user is not logged in
   const user = useSelector((state) => state.user);
   // shows error msg for this form
   const [err, setErr] = useState("");
-  // if registeration process completes (before code varified)
+  // if registration process completes (before code verified)
   const [correctInfo, setCorrectInfo] = useState(false);
   // hide and show - confirm-pass
   const [passInputType, setPassInputType] = useState("password");
   // stores form data - for resending code if needed
   const [userInfo, setUserInfo] = useState({ name: "", email: "", pass: "" });
   const [userLogged, setUserLogged] = useState(user.token);
-
 
   useEffect(() => {
     // All Input Fields
@@ -48,11 +52,11 @@ const Register = () => {
 
     const registerBtn = document.getElementById("register-btn");
 
-    // Pass & Confim-Pass matching
+    // Pass & Confirm-Pass matching
     [pass, confirmPass].forEach((field) => {
       field.addEventListener("input", (e) => {
         if (confirmPass.value !== pass.value && confirmPass.value !== "") {
-          setErr("Confrim Password does not match");
+          setErr("Confirm Password does not match");
           confirmPass.classList.add("wrong");
           registerBtn.style.backgroundColor = "#36404a";
           registerBtn.disabled = true;
@@ -67,19 +71,14 @@ const Register = () => {
   }, []);
 
   // change password input type
-  const toggleInputType = (e) => {
-    if (passInputType === "password") {
-      e.currentTarget.innerText = "hide";
-      setPassInputType("text");
-    } else {
-      e.currentTarget.innerText = "show";
-      setPassInputType("password");
-    }
+  const toggleInputType = () => {
+    setPassInputType((prevType) =>
+      prevType === "password" ? "text" : "password"
+    );
   };
 
-
-  // When Registered form is submited
-  const singup = async (e) => {
+  // When Registered form is submitted
+  const signup = async (e) => {
     e.preventDefault();
 
     const userName = document.getElementById("username");
@@ -105,10 +104,10 @@ const Register = () => {
       }),
     });
 
-    // getting Api responce
+    // getting API response
     const data = await request.json();
 
-    // if error occured
+    // if an error occurred
     if (!data.success) {
       setErr(data.error.msg);
       if (data.error.code === 4 || data.error.code === 0) {
@@ -127,7 +126,6 @@ const Register = () => {
     setCorrectInfo(true);
   };
 
-
   // Checking Verification Code
   const checkCode = async (e) => {
     e.preventDefault();
@@ -138,13 +136,13 @@ const Register = () => {
     // preventing bad requests
     if (!code.value) return;
 
-    code.addEventListener('click', () => {
-      code.classList.remove("wrong")
+    code.addEventListener("click", () => {
+      code.classList.remove("wrong");
       code.value = "";
       setErr("");
     });
 
-    // Verification Api call
+    // Verification API call
     const request = await fetch(`${API}/api/register/verify`, {
       method: "POST",
       headers: {
@@ -154,10 +152,10 @@ const Register = () => {
       body: JSON.stringify({ email: userInfo.email, code: code.value }),
     });
 
-    // Api responce
+    // API response
     const data = await request.json();
 
-    // If error occured and exit
+    // If an error occurred, exit
     if (!data.success) {
       setErr(data.error.msg);
       if (data.error.code === 7) {
@@ -166,19 +164,18 @@ const Register = () => {
       return;
     }
 
-    // set recieved user token
+    // set received user token
     localStorage.setItem("token", data.token);
     setUserLogged(true);
     // set user id
     dispatch(update({ id: data.userId }));
   };
 
-
   // For resending Code
   const resendCode = async () => {
     setErr("");
 
-    // Register Api call
+    // Register API call
     const request = await fetch(`${API}/api/register/`, {
       method: "POST",
       headers: {
@@ -192,10 +189,10 @@ const Register = () => {
       }),
     });
 
-    // Api responce
+    // API response
     const data = await request.json();
 
-    // If error occured
+    // If an error occurred
     if (!data.success) {
       setErr(data.error.msg);
       return;
@@ -206,18 +203,17 @@ const Register = () => {
 
   return (
     <div>
-      { userLogged && <Navigate to="/feed" />}
+      {userLogged && <Navigate to="/feed" />}
       <Header hidden={true} />
       <InputContainer>
-
         {/* Register Form */}
         {!correctInfo && (
-          <form className="holder" onSubmit={singup}>
+          <form className="holder" onSubmit={signup}>
             <label htmlFor="username">Register</label>
             <p>Join your professional community</p>
             <input type="text" id="username" placeholder="Username" />
             <input type="email" id="email" placeholder="Email" />
-            <input type="password" id="password" placeholder="Password" />
+            <input type={passInputType} id="password" placeholder="Password" />
             <div className="pass-container">
               <input
                 required
@@ -225,14 +221,16 @@ const Register = () => {
                 type={passInputType}
                 id="confirm-password"
               />
-              <strong onClick={toggleInputType}>show</strong>
+              <strong onClick={toggleInputType}>
+                {passInputType === "password" ? "show" : "hide"}
+              </strong>
             </div>
             {err && <p className="error">{err}</p>}
             <PrimaryBtn type="submit" id="register-btn">
               Register
             </PrimaryBtn>
             <Divider className="button-divider">or</Divider>
-            <GoogleBtn type="submit" onClick={singup}>
+            <GoogleBtn type="submit" onClick={signup}>
               <img src="/images/google.svg" alt="" />
               <span>Sing in with Google</span>
             </GoogleBtn>
@@ -257,7 +255,7 @@ const Register = () => {
               id="code"
               placeholder="XXXX"
             />
-            <strong onClick={resendCode}>Didn't Received? Resent Code</strong>
+            <strong onClick={resendCode}>Didn't Receive? Resend Code</strong>
             {err && <p className="error">{err}</p>}
             <PrimaryBtn type="submit">Let's Go</PrimaryBtn>
           </form>

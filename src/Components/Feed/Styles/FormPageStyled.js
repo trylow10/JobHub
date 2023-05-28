@@ -1,9 +1,18 @@
 import styled from "styled-components";
 
-// Main Holding Div
-export const InputContainer = styled.div``;
+export const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
 
-// All Post Container
+export const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 export const PostContainer = styled.div`
   padding-top: 10px;
 
@@ -33,11 +42,30 @@ export const PostContainer = styled.div`
   }
 `;
 
-export const SecondaryBtn = styled.button`{
+export const SecondaryBtn = styled.button`
   padding: 2px;
-}`;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--quick-transition);
 
-export const PrimaryBtn = styled.button`{
+  &:hover {
+    background-color: var(--secondary-color-hover);
+  }
+`;
+
+export const PrimaryBtn = styled.button`
   padding: 2px;
-}`;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--quick-transition);
 
+  &:hover {
+    background-color: var(--primary-color-hover);
+  }
+`;

@@ -11,8 +11,8 @@ import { Navigate } from "react-router-dom";
 import Header from "../Components/Welcome/Header";
 
 // Styled Components
-import { InputContainer, PrimaryBtn } from "../Components/Feed/Styles/FormPageStyled.js";
-import { LinkBtn, GoogleBtn, Divider } from "../Components/Feed/Styles/RegisterStyled.js";
+// import { InputContainer, PrimaryBtn } from "../Components/Feed/Styles/FormPageStyled.js";
+import { InputContainer, PrimaryBtn,LinkBtn, GoogleBtn, Divider } from "../Components/Feed/Styles/RegisterStyled.js";
 
 // ENV
 import { API } from "../env";
