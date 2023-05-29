@@ -11,11 +11,13 @@ const Session = require("../schema/session");
 
 // Generates user session token
 const generateToken = async (user) => {
-  const mail = sha512(user.email);
-  const mailPass = sha512(user.pass + mail);
-  const mailPassTime = sha512(new Date().getTime().toString() + mailPass);
-  const token = sha512(mailPassTime + uuid());
 
+  const emailHash = sha512(user.email);
+  const passwordHashWithEmail = sha512(user.pass + emailHash);
+  const timestamp = new Date().getTime().toString();
+  const concatenatedString = timestamp + passwordHashWithEmail;
+  const token = sha512(concatenatedString + uuid());
+  
   // for storing in DB
   const sessionTemplate = new Session({
     _id: user.id,
