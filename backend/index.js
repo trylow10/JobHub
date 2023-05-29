@@ -17,5 +17,5 @@ app.use("/api/login", require("./routes/login"));
 app.use("/api/register", require("./routes/register"));
 app.use("/api/user", require("./routes/user"));
 app.use("/api/post", require("./routes/post"));
-app.use("/api/jobs", require("./routes/job"));
+app.use("/api/job", require("./routes/job"));
 app.listen("5000", () => console.log("Server Started on Port: 5000"));

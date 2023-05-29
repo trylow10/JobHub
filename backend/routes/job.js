@@ -1,36 +1,46 @@
 // Libraries
 const express = require("express");
-const { validate } = require("email-validator");
-
-const signature = require("../crypto/functions").signature;
-const Verify = require("../schema/verification");
+const { validateToken } = require("../helper/token");
+const { signature } = require("../crypto/functions");
 const Job = require("../schema/job");
 
 const Router = express.Router();
 
-
 // Create a new job
-Router.post("/verify", async (req, res) => {
-    const responce = {};
-    const job = new Job({
+Router.post("/", validateToken, async (req, res) => {
+  const userId = req.body.activeSessionId;
+  const responce = {};
+
+  const job = new Job({
+    _id : userId,
     title: req.body.title,
+    description: req.body.description,
     company: req.body.company,
     workPlace: req.body.workPlace,
     jobLocation: req.body.jobLocation,
     jobType: req.body.jobType,
+    skills: req.body.skills
   });
 
   try {
     const newJob = await job.save();
-    res.status(201).json(newJob);
+    responce.success = true;
+    responce.msg = "Job created successfully";
+    res.status(201).json({ ...responce, signature: signature(responce) });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.log(error);
+    responce.success = false;
+    responce.msg = "Job creation failed";
+    res.status(400).json({ ...responce, signature: signature(responce) });
   }
 });
 
-  Router.put("/:id", async (req, res) => {
+Router.put("/update", validateToken, async (req, res) => {
+  const responce = {};
+  const userId = req.body.activeSessionId;
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById({_id: userId});
+    
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
@@ -40,31 +50,60 @@ Router.post("/verify", async (req, res) => {
     job.workPlace = req.body.workPlace;
     job.jobLocation = req.body.jobLocation;
     job.jobType = req.body.jobType;
+    job.skills = req.body.skills;
 
     const updatedJob = await job.save();
-    res.json(updatedJob);
+    responce.success = true;
+    responce.msg = "Job updated successfully";
+    res.json({ ...responce, signature: signature(responce) });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.log("updating job error",error)
+    responce.success = false;
+    responce.msg = "Job update failed";
+    res.status(400).json({ ...responce, signature: signature(responce),error });
   }
 });
 
 // Delete a job by ID
-Router.delete("/:id", async (req, res) => {
+Router.delete("/remove", validateToken, async (req, res) => {
+  const responce = {};
+  const userId = req.body.activeSessionId;
+
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById({_id:userId});
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-
     await job.remove();
-    res.json({ message: "Job deleted successfully" });
+    responce.success = true;
+    responce.msg = "Job deleted successfully";
+    res.json({ ...responce, signature: signature(responce) });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
+    responce.success = false;
+    responce.msg = "Job deletion failed";
+    res.status(500).json({ ...responce, signature: signature(responce) });
+  }
+});
+
+Router.get("/allJobs", validateToken, async (req, res) => {
+  let responce = {};
+  try {
+    const jobs = await Job.find();
+    if (jobs.length === 0) {
+      return res.status(404).json({ message: "No jobs found" });
+    }
+    responce.success = true;
+    responce.message = "All Jobs";
+    responce.jobs = jobs; // Include the jobs in the responce
+    res.json({ ...responce, signature: signature(responce) });
+  } catch (error) {
+    console.log(error);
+    responce.success = false;
+    responce.message = "Job retrieval failed";
+    res.status(500).json({ ...responce, signature: signature(responce) });
   }
 });
 
 
-
-// return res.json({ ...responce, signature: signature(responce) });
 module.exports = Router;
-
