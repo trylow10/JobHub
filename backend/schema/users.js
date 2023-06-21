@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
   },
   headline: {
     type: String,
-    default: ""
+    default: "",
   },
   email: {
     type: String,
@@ -30,29 +30,64 @@ const userSchema = mongoose.Schema({
     default: "",
   },
   followers: {
-    type: Object,
+    type: [String],
     default: [],
   },
   following: {
-    type: Object,
+    type: [String],
     default: [],
   },
   networks: {
-    type: Object,
+    type: [String],
     default: [],
   },
-  hashtag: {
-    type: Object,
+  hashtags: {
+    type: [String],
+    default: [],
+  },
+  recommendedPosts: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     default: [],
   },
   networkReqs: {
-    type: Object,
+    type: [String],
     default: [],
   },
   sendReqs: {
-    type: Object,
-    default: []
-  }
+    type: [String],
+    default: [],
+  },
+  roles: {
+    type: String,
+    required: true,
+    enum: ["jobSeeker", "jobPoster"],
+    default: "jobSeeker",
+  },
+  skills: {
+    type: [String],
+    default: [],
+    required:true,
+  },
+  experience: {
+    type: Number,
+    default: 0,
+  },
+  company: {
+    type: String,
+    required: true
+  },
+  workPlace: {
+    type: String,
+    enum: ['Onsite', 'Remote', 'Hybrid']
+  },
+  jobLocation: {
+    type: String
+  },
+  jobType: {
+    type: String,
+    enum: ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship', 'Temporary', 'Volunteer']
+  },
 });
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+module.exports = User;
