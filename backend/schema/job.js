@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const JobSchema = new mongoose.Schema({
-  _id: {
-    type: String,
-    required: true,
-  },
   title: {
     type: String,
     required: true
@@ -12,6 +8,10 @@ const JobSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true
+  },
+  experience: {
+    type: Number,
+    default: 0,
   },
   company: {
     type: String,
@@ -28,8 +28,15 @@ const JobSchema = new mongoose.Schema({
     type: String,
     enum: ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship', 'Temporary', 'Volunteer']
   },
-  skills:{},
-  
+  skills: {
+    type: Object,
+    default: [],
+  },
+  jobPoster: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
 });
 
 const Job = mongoose.model('Job', JobSchema);
