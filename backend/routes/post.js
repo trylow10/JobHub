@@ -1,9 +1,6 @@
 const express = require("express");
 const { signature } = require("../crypto/functions");
-const uuid = require("uuid").v4;
-const sha512 = require("js-sha512");
 const ImageKit = require("imagekit");
-
 const { validateToken } = require("../helper/token");
 const { binarySearch } = require("../helper/search");
 const Post = require("../schema/post");
@@ -111,17 +108,58 @@ Router.get("/one", validateToken, async (req, res) => {
   return res.json({ ...responce, signature: signature(responce) });
 });
 
+Router.get("/recommended", validateToken, async (req, res) => {
+  const userId = req.query.userId || req.body.activeSessionId;
+  const response = {};
+
+  try {
+    // Find the user
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      response["success"] = false;
+      response["error"] = { msg: "User not found", code: 10 };
+      return res.json({ ...response, signature: signature(response) });
+    }
+
+    // Get the user's following users
+    const followingUsers = user.following || [];
+
+    // Find recommended posts that match the user's related posts' hashtags
+    const recommendedPosts = await Post.find({
+      $or: [
+        { _id: { $in: user.recommendedPosts } }, // Posts recommended based on user's activity
+        { _id: { $in: followingUsers } }, // Posts from users the user is following
+        { hashtags: { $in: user.hashtags } }, // Posts with matching hashtags
+      ],
+      _id: { $ne: userId }, // Exclude the user's own posts
+    })
+      .sort({ _id: -1 }) // Sort by descending order of post ID
+      .limit(5) // Retrieve a maximum of 5 recommended posts
+      .lean(); // Convert documents to plain JavaScript objects
+
+    response["success"] = true;
+    response["userId"] = userId;
+    response["recommendedPosts"] = recommendedPosts;
+    return res.json({ ...response, signature: signature(response) });
+  } catch (error) {
+    console.error("Error fetching recommended posts:", error);
+    res.status(500).json({ success: false, error: { msg: "Internal server error" } });
+  }
+});
+
+// Create a new post
+
 Router.post("/", validateToken, async (req, res) => {
   const userId = req.body.activeSessionId;
-  const postTxt = req.body.text || [];
+  const postTxt = req.body.text || '';
   const postImgs = req.body.postImgs || [];
-
-  const responce = {};
-  if (postTxt.length < 1 && postTxt.length < 1) {
-    responce["success"] = false;
-    responce["error"] = { msg: "Either give text or imgs", code: 14 };
-    return res.json({ ...responce, signature: signature(responce) });
+  const response = {};
+  if (!postTxt && postImgs.length === 0) {
+    response["success"] = false;
+    response["error"] = { msg: "Either give text or imgs", code: 14 };
+    return res.json({ ...response, signature: signature(response) });
   }
+
 
   const newPost = {};
 
@@ -153,47 +191,92 @@ Router.post("/", validateToken, async (req, res) => {
   newPost.totalActions = 0;
   newPost.totalComments = 0;
 
-  const userPosts = await Post.findOne({ _id: userId });
+  try {
+    const userPosts = await Post.findOne({ _id: userId });
 
-  if (!userPosts) {
-    const PostTemplate = new Post({
-      _id: userId,
-      posts: [newPost],
-      comments: [{ _id: newPost._id, comments: [] }],
-    });
-    await PostTemplate.save();
+    if (!userPosts) {
+      const PostTemplate = new Post({
+        _id: userId,
+        posts: [newPost],
+        comments: [{ _id: newPost._id, comments: [] }],
+      });
+      await PostTemplate.save();
 
-    responce["success"] = true;
-    responce["msg"] = "post created";
-    return res.json({ ...responce, signature: signature(responce) });
-  }
-
-  const postLength = userPosts.posts.length;
-  if (postLength > 0) {
-    newPost._id = parseInt(userPosts.posts[0]._id) + 1;
-  }
-
-  await Post.findOneAndUpdate(
-    { _id: userId },
-    {
-      posts: [newPost, ...userPosts.posts],
-      comments: [{ _id: newPost._id, comments: [] }, ...userPosts.comments],
+      response["success"] = true;
+      response["msg"] = "post created";
+      return res.json({ ...response, signature: signature(response) });
     }
-  );
 
-  responce["success"] = true;
-  responce["msg"] = "post created";
-  res.json({ ...responce, signature: signature(responce) });
+    const posts = userPosts.posts || [];
+    const postLength = posts.length;
 
-  const user = await User.findOne({ _id: userId });
-  const followers = user.followers;
+    if (postLength > 0) {
+      newPost._id = parseInt(posts[0]._id) + 1;
+    }
 
-  for (let follower of followers) {
-    const feed = (await Post.findOne({ _id: follower })).feed;
-    await Post.findOneAndUpdate(
-      { _id: follower },
-      { feed: [{ _id: userId, post: newPost._id }, ...feed] }
+    const hashtags = postTxt.reduce((acc, text) => {
+      const matches = text.match(/#\w+/g);
+      if (matches) {
+        acc.push(...matches);
+      }
+      return acc;
+    }, []);
+    
+        // Update hashtags in the User collection
+    await User.findOneAndUpdate(
+      { _id: userId },
+      { $addToSet: { hashtags: { $each: hashtags } } }
     );
+
+    newPost.hashtags = hashtags;
+
+    // Save the new post in the Post collection
+    await Post.findOneAndUpdate(
+      { _id: userId },
+      {
+        posts: [newPost, ...userPosts.posts],
+        comments: [{ _id: newPost._id, comments: [] }, ...userPosts.comments],
+      }
+    );
+
+    response["success"] = true;
+    response["msg"] = "post created";
+    res.json({ ...response, signature: signature(response) });
+
+    const user = await User.findOne({ _id: userId });
+    const followers = user.followers;
+
+    for (let follower of followers) {
+      const feed = (await Post.findOne({ _id: follower })).feed;
+      await Post.findOneAndUpdate(
+        { _id: follower },
+        { feed: [{ _id: userId, post: newPost._id }, ...feed] }
+      );
+    }
+
+    // Find related posts with similar hashtags
+    const relatedPosts = await Post.find({
+      _id: { $ne: userId },
+      hashtags: { $in: hashtags },
+    })
+      .sort({ _id: -1 })
+      .limit(5)
+      .lean();
+
+    // Update recommendedPosts in the User collection
+    await User.findOneAndUpdate(
+      { _id: userId },
+      {
+        $addToSet: {
+          recommendedPosts: { $each: relatedPosts.map((post) => post._id) },
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error creating post:", error);
+    res
+      .status(500)
+      .json({ success: false, error: { msg: "Internal server error" } });
   }
 });
 
@@ -487,7 +570,7 @@ Router.delete("/", validateToken, async (req, res) => {
 
 Router.post("/image", validateToken, async (req, res) => {
   const userId = req.body.activeSessionId;
-  const responce = {};  
+  const responce = {};
   const userPostItem = await Post.findOne({ _id: userId });
   if (!userPostItem) {
     responce["success"] = false;
