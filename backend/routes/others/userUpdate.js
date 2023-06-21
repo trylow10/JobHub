@@ -1,7 +1,6 @@
 const express = require("express");
 const User = require("../../schema/users");
 const signature = require("../../crypto/functions").signature;
-const { getUser } = require("../../helper/search");
 const { validateToken } = require("../../helper/token");
 const Post = require("../../schema/post");
 
@@ -10,33 +9,7 @@ const Router = express.Router();
 // uname, headline, bgImg, profileImg
 Router.post("/info", validateToken, async (req, res) => {
   const actualUser = req.body.activeSessionId;
-  const uname = req.body.uname;
-  const headline = req.body.headline;
-  const bgImg = req.body.bgImg;
-  const profileImg = req.body.profileImg;
   const responce = {};
-
-  // if special chars in username other than _
-  for (let i of uname || "") {
-    const ascii = i.charCodeAt(0);
-    const allNums = ascii > 47 && ascii < 58;
-    const allCapChar = ascii > 64 && ascii < 91;
-    const allSmallChar = ascii > 96 && ascii < 123;
-    const underScore = ascii === 95;
-
-    if (!(allNums || allCapChar || allSmallChar || underScore)) {
-      responce["success"] = false;
-      responce["error"] = { msg: "wrong username format", code: 0 };
-      return res.json({ ...responce, signature: signature(responce) });
-    }
-  }
-
-  // If username found in DB
-  if (uname !== undefined && (await getUser(uname))) {
-    responce["success"] = false;
-    responce["error"] = { msg: "username already exists", code: 4 };
-    return res.json({ ...responce, signature: signature(responce) });
-  }
 
   const userDB = await User.findOne({ _id: actualUser });
   if (!userDB) {
@@ -45,18 +18,45 @@ Router.post("/info", validateToken, async (req, res) => {
     return res.json({ ...responce, signature: signature(responce) });
   }
 
-  const updates = {
-    uname: uname === undefined ? userDB.uname : uname,
-    headline: headline === undefined ? userDB.headline : headline,
-    bgImg: bgImg === undefined ? userDB.bgImg : bgImg,
-    profileImg: profileImg === undefined ? userDB.profileImg : profileImg,
-  };
+  const updates = { ...req.body };
+  // console.log("beofr",updates);
+  delete updates.activeSessionId;
 
-  await User.findOneAndUpdate({ _id: actualUser }, { ...updates });
+  if (updates.uname) {
+    // Check if username already exists
+    const userWithUname = await User.findOne({ uname: updates.uname });
+    if (userWithUname && userWithUname._id.toString() !== actualUser) {
+      responce["success"] = false;
+      responce["error"] = { msg: "Username already exists", code: 4 };
+      return res.json({ ...responce, signature: signature(responce) });
+    }
+
+    // Regex check for username format
+    const usernameRegex = /^[A-Za-z0-9_]+$/;
+    if (!usernameRegex.test(updates.uname)) {
+      responce["success"] = false;
+      responce["error"] = { msg: "Invalid username format", code: 5 };
+      return res.json({ ...responce, signature: signature(responce) });
+    }
+  }
+
+  const {
+    uname = userDB.uname,
+    headline = userDB.headline,
+    bgImg = userDB.bgImg,
+    profileImg = userDB.profileImg,
+    skills = userDB.skills
+  } = updates;
+  // console.log("after",updates);
+
+  await User.findOneAndUpdate({ _id: actualUser }, { $set: { uname, headline, bgImg, profileImg, skills } });
+
   responce["success"] = true;
   responce["msg"] = "User updated";
   return res.json({ ...responce, signature: signature(responce) });
 });
+
+
 
 // Follow & Following
 Router.post("/following", validateToken, async (req, res) => {
