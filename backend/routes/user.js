@@ -92,6 +92,7 @@ Router.get("/basic", validateToken, async (req, res) => {
         "followers",
         "following",
         "networks",
+        "skills"
       ],
       key
     );
@@ -173,72 +174,53 @@ Router.post("/image", validateToken, async (req, res) => {
   const fileName = sha512(
     Math.ceil(Math.random() * 10000).toString() + uuid() + userId
   );
-  const responce = {};
+  const response = {};
 
-  // validating extension
-  const validExtension = ["png", "jpg", "jpeg", "webp"];
-  for (let i = 0; i < validExtension.length; i++) {
-    if (validExtension[i] === req.body.extension) {
-      break;
-    }
-
-    if (i + 1 === validExtension.length) {
-      responce["success"] = false;
-      responce["error"] = { msg: "Invalid Extension", code: 30 };
-      return res.json({ ...responce, signature: signature(responce) });
-    }
+  // Validating extension
+  const validExtensions = ["png", "jpg", "jpeg", "webp", "gif"];
+  if (!validExtensions.includes(req.body.extension)) {
+    response["success"] = false;
+    response["error"] = { msg: "Invalid Extension", code: 30 };
+    return res.json({ ...response, signature: signature(response) });
   }
 
-  if (option === "pf") {
-    const pfImgSplit = userDB.profileImg.split("/");
-    const pfImg = pfImgSplit[pfImgSplit.length - 1];
-    if (pfImg) {
-      imagekit.listFiles(
-        { skip: 0, limit: 1, searchQuery: `name="${pfImg}"` },
-        function (fError, files) {
-          if (fError) console.log(fError);
-          const fileId = files[0]?.fileId;
-          if (!fileId) return;
+  // Delete previous image if necessary
+  const imageField = option === "pf" ? "profileImg" : "bgImg";
+  const imageFieldSplit = userDB[imageField].split("/");
+  const imageName = imageFieldSplit[imageFieldSplit.length - 1];
+  if (imageName) {
+    imagekit.listFiles(
+      { skip: 0, limit: 1, searchQuery: `name="${imageName}"` },
+      function (fError, files) {
+        if (fError) console.log(fError);
+        const fileId = files[0]?.fileId;
+        if (fileId) {
           imagekit.deleteFile(fileId, function (error, result) {
             if (error) console.log(error);
           });
         }
-      );
-    }
-  } else {
-    const bgImgSplit = userDB.bgImg.split("/");
-    const bgImg = bgImgSplit[bgImgSplit.length - 1];
-    if (bgImg) {
-      imagekit.listFiles(
-        { skip: 0, limit: 1, searchQuery: `name="${bgImg}"` },
-        function (fError, files) {
-          if (fError) console.log(fError);
-          const fileId = files[0]?.fileId;
-          if (!fileId) return;
-          imagekit.deleteFile(fileId, function (error, result) {
-            if (error) console.log(error);
-          });
-        }
-      );
-    }
+      }
+    );
   }
 
+  // Upload new image
   imagekit.upload(
     {
-      file: req.body.data.split("base64,")[1], //required
-      fileName: `${fileName}.${req.body.extension}`, //required
+      file: req.body.data.split("base64,")[1], // Required image data in base64 format
+      fileName: `${fileName}.${req.body.extension}`, // Required image file name
     },
     function (error, result) {
       if (error) {
-        responce["success"] = true;
-        responce["error"] = { msg: "Something went wrong", code: 31 };
-        return res.json({ ...responce, signature: signature(responce) });
+        response["success"] = false;
+        response["error"] = { msg: "Something went wrong", code: 31 };
+        return res.json({ ...response, signature: signature(response) });
       }
 
-      responce["success"] = true;
-      responce["link"] = result.url;
-      res.json({ ...responce, signature: signature(responce) });
+      response["success"] = true;
+      response["link"] = result.url;
+      res.json({ ...response, signature: signature(response) });
     }
   );
 });
+
 module.exports = Router;
