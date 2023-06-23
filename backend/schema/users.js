@@ -73,8 +73,7 @@ const userSchema = mongoose.Schema({
     default: 0,
   },
   company: {
-    type: String,
-    required: true
+    type: String
   },
   workPlace: {
     type: String,

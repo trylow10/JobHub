@@ -42,8 +42,9 @@ export const Title = styled.h2`
 export const ItemContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  justify-content: space-between;
-  margin-top: 2rem;
+  place-items:center;
+  gap:20px;
+  margin: 2rem 20% 0 20%;
   padding: 0 2rem;
 
   @media screen and (max-width: 1080px) {

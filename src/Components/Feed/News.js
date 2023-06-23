@@ -68,7 +68,7 @@ const WebNews = () => {
     <Holder>
       <Heading>
         <p>LinkedIn News</p>
-        <i className="fa-solid fa-circle-info"></i>
+        {/* <i className="fa-solid fa-circle-info"></i> */}
       </Heading>
 
       <NewsBodyContainer />

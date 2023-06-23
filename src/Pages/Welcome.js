@@ -5,9 +5,9 @@ import React from "react";
 import Header from "../Components/Welcome/Header";
 import Feature from "../Components/Welcome/Feature"
 import MainImg from "../Components/Welcome/MainImg"
-import OpenSection from "../Components/Welcome/OptionSection"
-import Review from "../Components/Welcome/OptionSection"
-import Video from "../Components/Welcome/OptionSection"
+// import OpenSection from "../Components/Welcome/OptionSection"
+// import Review from "../Components/Welcome/OptionSection"
+// import Video from "../Components/Welcome/OptionSection"
 // Styled Components
 
 

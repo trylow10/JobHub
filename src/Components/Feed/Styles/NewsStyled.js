@@ -26,7 +26,10 @@ export const Container = styled.div`
 `;
 
 // News Container Div
-export const Holder = styled.div`
+export const Holder = styled.div` 
+  position:fixed;
+  top:25%;
+  right:62px;
   height: fit-content;
   background: white;
   padding: 1rem 0 0.7rem;
@@ -68,6 +71,7 @@ export const NewsSection = styled.div`
 // News Container Heading
 export const Heading = styled.div`
   display: flex;
+  flex-direction:column;
   justify-content: space-between;
   padding: 0 1rem;
 

@@ -6,18 +6,29 @@ import { Container, Form, InputDiv } from "./Styles/UserUpdateStyled";
 import { ImgDiv, Profile, TxtDiv, Save } from "./Styles/UserUpdateStyled";
 
 // ENV
-import { API, BACKGROUND_IMG, HEADLINE, LOADING_GIF, PROFILE_IMG } from "../../env";
+import {
+  API,
+  BACKGROUND_IMG,
+  HEADLINE,
+  LOADING_GIF,
+  PROFILE_IMG,
+} from "../../env";
 
 const UserUpdate = ({ token, userInfo, getUserInfo }) => {
   const [err, setErr] = useState("");
   const [load, setLoad] = useState(false);
+  const [skills, setSkills] = useState([]);
+  const [newSkill, setNewSkill] = useState("");
   let exit = true;
   const uploadImg = async (elem, option) => {
     const Request = await fetch(
       `${API}/api/user/image?token=${localStorage.getItem("token")}`,
       {
         method: "POST",
-        headers: { Accepts: "application/json", "Content-Type": "application/json"},
+        headers: {
+          Accepts: "application/json",
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           extension: elem.dataset["ext"],
           data: elem.src,
@@ -44,7 +55,7 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
     const bgImg = document.querySelector("#userinfo-update input#bgImg");
 
     const userInfoUpdater = document.getElementById("userinfo-update");
-    if (!userName && !headline && !profileImg.value && !bgImg.value) {
+    if (!userName && !headline && !profileImg.value && !bgImg.value && skills.length === 0) {
       userInfoUpdater.classList.remove("visible");
       return;
     }
@@ -66,12 +77,16 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
 
     const responce = await fetch(`${API}/api/user/update/info?token=${token}`, {
       method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         uname: userName || undefined,
         headline: headline || undefined,
         bgImg: bgImgLink || undefined,
         profileImg: profileImgLink || undefined,
+        skills: skills || undefined, // Add the skills array to the payload
       }),
     });
 
@@ -94,6 +109,24 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
     userInfoUpdater.classList.remove("visible");
     getUserInfo();
   };
+
+  const handleAddSkill = () => {
+    const skill = newSkill.trim();
+
+    if (skill === "") return;
+
+    setSkills((prevSkills) => [...prevSkills, skill]);
+    setNewSkill("");
+  };
+
+  const handleRemoveSkill = () => {
+    if (skills.length === 0) return;
+
+    const updatedSkills = [...skills];
+    updatedSkills.pop();
+    setSkills(updatedSkills);
+  };
+
 
   const inputReset = (e) => {
     e.currentTarget.classList.remove("wrong");
@@ -169,6 +202,13 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
     document.querySelector(`#userinfo-update input#bgImg`).click();
   };
 
+
+  useEffect(() => {
+    if (userInfo.skills && userInfo.skills.length > 0) {
+      setSkills(userInfo.skills);
+    }
+  }, [userInfo.skills]);
+  
   return (
     <Container className="holder" id="userinfo-update">
       <Form className="form">
@@ -213,7 +253,74 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
             />
             {err && <p className="error">{err}</p>}
           </InputDiv>
-
+          {/* <InputDiv>
+          <div className="skills-container">
+            <h4>Skills:</h4>
+            {skills.length > 0 ? (
+              <input
+                type="text"
+                id="skill-input"
+                placeholder={userInfo.skills}
+                value={newSkill}
+                onChange={(e) => setNewSkill(e.target.value)}
+              />
+            ) : (
+              <input
+                type="text"
+                id="skill-input"
+                placeholder="Add skills"
+                value={newSkill}
+                onChange={(e) => setNewSkill(e.target.value)}
+              />
+            )}
+            <div className="add-remove-buttons">
+              <button className="add-skill-button" onClick={handleAddSkill}>
+                Add Skill
+              </button>
+              <button
+                className="remove-skill-button"
+                onClick={handleRemoveSkill}
+                disabled={skills.length === 0}
+              >
+                Remove Skill
+              </button>
+            </div>
+          </div>
+        </InputDiv> */}
+          <InputDiv>
+            <div className="skills-container">
+              <h4>Skills:</h4>
+              {skills.length > 0 ? (
+                <input
+                  type="text"
+                  id="skill-input"
+                  placeholder={skills.join(", ")}
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                />
+              ) : (
+                <input
+                  type="text"
+                  id="skill-input"
+                  placeholder="Add skills"
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                />
+              )}
+              <div className="add-remove-buttons">
+                <button className="add-skill-button" onClick={handleAddSkill}>
+                  Add Skill
+                </button>
+                <button
+                  className="remove-skill-button"
+                  onClick={handleRemoveSkill}
+                  disabled={skills.length === 0}
+                >
+                  Remove Skill
+                </button>
+              </div>
+            </div>
+          </InputDiv>
           <input
             type="file"
             accept="image/*"

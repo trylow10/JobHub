@@ -119,6 +119,29 @@ export const InputDiv = styled.div`
   input.wrong {
     background-color: #ff000033;
   }
+  
+  .add-skill-button {
+    /* Styles for add skills button */
+    background-color: #4caf50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+
+  .remove-skill-button {
+    /* Styles for remove skills button */
+    background-color: #f44336;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+  
 `;
 
 export const TxtDiv = styled.div`

@@ -22,47 +22,27 @@ import { API } from "../env";
 const Register = () => {
   const dispatch = useDispatch();
 
-  // user-info - for checking if the user is not logged in
   const user = useSelector((state) => state.user);
-  // shows error msg for this form
   const [err, setErr] = useState("");
-  // if registration process completes (before code verified)
   const [correctInfo, setCorrectInfo] = useState(false);
-  // hide and show - confirm-pass
   const [passInputType, setPassInputType] = useState("password");
-  // stores form data - for resending code if needed
   const [userInfo, setUserInfo] = useState({ name: "", email: "", pass: "" });
   const [userLogged, setUserLogged] = useState(user.token);
 
   useEffect(() => {
-    // All Input Fields
-    const userName = document.getElementById("username");
-    const email = document.getElementById("email");
-    const pass = document.getElementById("password");
+    const registerBtn = document.getElementById("register-btn");
     const confirmPass = document.getElementById("confirm-password");
 
-    // Removing Red fields if any
-    [userName, email, pass].forEach((field) => {
-      if (!field) return;
-      field.addEventListener("click", (e) => {
-        e.currentTarget.classList.remove("wrong");
-        setErr("");
-      });
-    });
-
-    const registerBtn = document.getElementById("register-btn");
-
-    // Pass & Confirm-Pass matching
-    [pass, confirmPass].forEach((field) => {
-      field.addEventListener("input", (e) => {
-        if (confirmPass.value !== pass.value && confirmPass.value !== "") {
+    [confirmPass].forEach((field) => {
+      field.addEventListener("input", () => {
+        if (confirmPass.value !== field.value && confirmPass.value !== "") {
           setErr("Confirm Password does not match");
-          confirmPass.classList.add("wrong");
+          field.classList.add("wrong");
           registerBtn.style.backgroundColor = "#36404a";
           registerBtn.disabled = true;
         } else {
           setErr("");
-          confirmPass.classList.remove("wrong");
+          field.classList.remove("wrong");
           registerBtn.style.backgroundColor = "var(--primary-color)";
           registerBtn.disabled = false;
         }
@@ -70,27 +50,23 @@ const Register = () => {
     });
   }, []);
 
-  // change password input type
   const toggleInputType = () => {
     setPassInputType((prevType) =>
       prevType === "password" ? "text" : "password"
     );
   };
 
-  // When Registered form is submitted
-  const signup = async (e) => {
+  const singup = async (e) => {
     e.preventDefault();
 
     const userName = document.getElementById("username");
     const email = document.getElementById("email");
     const pass = document.getElementById("password");
 
-    // preventing bad requests
     if (!userName.value || !email.value || !pass.value) {
       return;
     }
 
-    // Register API call
     const request = await fetch(`${API}/api/register`, {
       method: "POST",
       headers: {
@@ -104,16 +80,17 @@ const Register = () => {
       }),
     });
 
-    // getting API response
     const data = await request.json();
-
-    // if an error occurred
+    console.log(data);
     if (!data.success) {
       setErr(data.error.msg);
-      if (data.error.code === 4 || data.error.code === 0) {
-        userName.classList.toggle("wrong");
-      } else if (data.error.code === 5 || data.error.code === 1) {
-        email.classList.toggle("wrong");
+      const fieldMap = {
+        4: userName,
+        5: email,
+      };
+      const field = fieldMap[data.error.code];
+      if (field) {
+        field.classList.toggle("wrong");
       }
       return;
     }
@@ -201,14 +178,16 @@ const Register = () => {
     console.log("NEW CODE:", data.code);
   };
 
+  if (userLogged) {
+    return <Navigate to="/feed" />;
+  }
+
   return (
     <div>
-      {userLogged && <Navigate to="/feed" />}
       <Header hidden={true} />
       <InputContainer>
-        {/* Register Form */}
         {!correctInfo && (
-          <form className="holder" onSubmit={signup}>
+          <form className="holder" onSubmit={singup}>
             <label htmlFor="username">Register</label>
             <p>Join your professional community</p>
             <input type="text" id="username" placeholder="Username" />
@@ -230,7 +209,7 @@ const Register = () => {
               Register
             </PrimaryBtn>
             <Divider className="button-divider">or</Divider>
-            <GoogleBtn type="submit" onClick={signup}>
+            <GoogleBtn type="submit" onClick={singup}>
               <img src="/images/google.svg" alt="" />
               <span>Sing in with Google</span>
             </GoogleBtn>

@@ -23,6 +23,7 @@ export const ReqTitle = styled.h2`
 
 export const Requests = styled.div`
   padding: 1.5rem 0 1rem;
+  margin-left:20%;
 
   hr {
     border-color: #d8d8d852;

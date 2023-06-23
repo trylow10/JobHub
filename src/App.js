@@ -11,6 +11,8 @@ import ForgetPass from "./Pages/ForgetPass";
 import Register from "./Pages/Register";
 import Login from "./Pages/Login";
 import Post from "./Pages/Post";
+import Job from "./Pages/Job";
+import JobDetail from "./Pages/JobDetail";
 
 function App() {
   const dispatch = useDispatch();
@@ -30,6 +32,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/feed" element={<Feed />} />
+          <Route path="/job" element={<Job />} />
+          <Route path="/job/:id" element={<JobDetail />} />
+
           <Route path="/forget-pass" element={<ForgetPass />} />
           <Route path="/join-now" element={<Register />} />
           <Route path="/post" element={<Post />} />
