@@ -1,5 +1,5 @@
 // Libraries
-import React from "react";
+import {React} from "react";
 import { useSelector } from "react-redux"; // redux
 
 // Styled Components
@@ -10,20 +10,25 @@ import { Connection, Premium, InfoConatiner } from "./Styles/UserInfoStyled";
 import { BACKGROUND_IMG, HEADLINE, PROFILE_IMG } from "../../env";
 
 // Component Code
-const MainContainer = ({ userInfo }) => {
+// TODO i want showDisoverMore default value to show 
+const MainContainer = ({ userInfo, showDisoverMore }) => {
+
   return (
     <Container>
       {/* User Profile */}
       <Section>
         <InfoConatiner>
           <img
-            src={(userInfo.bg || BACKGROUND_IMG)+"?tr=w-800,h-300,cm-extract,fo-center,q-90"}
+            src={
+              (userInfo.bg || BACKGROUND_IMG) +
+              "?tr=w-800,h-300,cm-extract,fo-center,q-90"
+            }
             alt=""
           />
 
           <Profile>
             <img
-              src={(userInfo.profile || PROFILE_IMG)+"?tr=w-100,h-100"}
+              src={(userInfo.profile || PROFILE_IMG) + "?tr=w-100,h-100"}
               alt=""
             />
             <h4 className="user-name">{userInfo.uname}</h4>
@@ -57,19 +62,21 @@ const MainContainer = ({ userInfo }) => {
       </Section>
 
       {/* Discover More */}
-      <Section className="discover">
-        <span className="groups">groups</span>
-        <span className="events">
-          <p>events</p>
-          <i className="fa-solid fa-plus" />
-        </span>
-        <span className="hashtags">followed hashtags</span>
-        <hr />
+      {showDisoverMore && (
+        <Section className="discover">
+          <span className="groups">groups</span>
+          <span className="events">
+            <p>events</p>
+            <i className="fa-solid fa-plus" />
+          </span>
+          <span className="hashtags">followed hashtags</span>
+          <hr />
 
-        <Section className="more">
-          <span>Discover more</span>
+          <Section className="more">
+            <span>Discover more</span>
+          </Section>
         </Section>
-      </Section>
+      )}
     </Container>
   );
 };

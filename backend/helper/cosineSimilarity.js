@@ -1,17 +1,18 @@
-function cosineSimilarity(job, applicant) {
+
+function cosineSimilarity(job, user) {
   const jobSkills = job.skills || [];
-  const userSkills = applicant.user.skills || [];
+  const userSkills = user.skills || [];
   const jobExperience = job.experience || 0;
   const jobCompany = job.company || "";
   const jobWorkPlace = job.workPlace || "";
   const jobLocation = job.jobLocation || "";
   const jobType = job.jobType || "";
 
-  const userExperience = applicant.user.experience || 0;
-  const userCompany = applicant.user.company || "";
-  const userWorkPlace = applicant.user.workPlace || "";
-  const userLocation = applicant.user.jobLocation || "";
-  const userJobType = applicant.user.jobType || "";
+  const userExperience = user.experience || 0;
+  const userCompany = user.company || "";
+  const userWorkPlace = user.workPlace || "";
+  const userLocation = user.jobLocation || "";
+  const userJobType = user.jobType || "";
 
   const fields = [
     "skills",

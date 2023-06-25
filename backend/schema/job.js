@@ -29,9 +29,10 @@ const JobSchema = new mongoose.Schema({
     enum: ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship', 'Temporary', 'Volunteer']
   },
   skills: {
-    type: Object,
+    type: [String],
     default: [],
   },
+  
   jobPoster: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

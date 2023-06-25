@@ -16,8 +16,6 @@ router.post("/:jobId/apply", validateToken, async (req, res) => {
   const userId = req.body.activeSessionId;
   const { experience, company, workPlace, jobLocation } = req.body;
 
-  
-
   try {
     const job = await Job.findById(jobId);
     if (!job) {
@@ -27,10 +25,6 @@ router.post("/:jobId/apply", validateToken, async (req, res) => {
     const user = await User.findById(userId);
     if (!user) {
       return res.customError(404, { success: false, message: "User not found" });
-    }
-
-    if (user.role !== "jobSeeker") {
-      return res.customError(400, { success: false, message: "Only job seekers can apply for jobs" });
     }
 
     const existingApplication = await Application.findOne({ job: jobId, user: userId });
@@ -52,22 +46,6 @@ router.post("/:jobId/apply", validateToken, async (req, res) => {
     user.jobType = job.type;
 
     await user.save();
-    
-
-    // const userSkills = user.skills || [];
-    // const jobSkills = job.skills || [];
-
-    const { similarity, matchedSkills, status, reason } = cosineSimilarity(job, user);
-
-    if (status === "rejected") {
-      return res.customError(400, {
-        success: false,
-        message: "You do not have the required skills for this job",
-        matchedSkills,
-        similarity,
-        reason,
-      });
-    }
 
     const application = await Application.create({
       job: jobId,
@@ -79,9 +57,6 @@ router.post("/:jobId/apply", validateToken, async (req, res) => {
       success: true,
       message: "Application submitted successfully",
       application,
-      matchedSkills,
-      similarity,
-      reason,
     });
   } catch (error) {
     console.log(error);
@@ -124,79 +99,23 @@ router.get("/:jobId/applicants", validateToken, async (req, res) => {
   }
 });
 
-
-// Get matched applicants for a specific job using normal
-
-// router.get("/:jobId/matchApplicants", validateToken, async (req, res) => {
-//   const jobId = req.params.jobId;
-//   let response = {};
-
-//   try {
-//     const job = await Job.findById(jobId);
-//     if (!job) {
-//       response.message = "Job not found";
-//       return res.status(404).json({ ...response });
-//     }
-
-//     const jobSkills = job.skills;
-//     const applicants = await Application.find({
-//       job: jobId,
-//       status: "applied",
-//     }).populate("user");
-
-//     // Perform matching based on criteria
-//     const matchedApplicants = [];
-//     applicants.forEach((applicant) => {
-//       const userSkills = applicant.user.skills;
-//       // Add additional criteria checks here (e.g., experience, education, location)
-
-//       // Perform matching based on skills
-//       const matchingSkills = userSkills.filter((skill) =>
-//         jobSkills.includes(skill)
-//       );
-
-//       if (matchingSkills.length > 0) {
-//         matchedApplicants.push(applicant);
-//       }
-//     });
-
-//     response.success = true;
-//     response.message = "Matched applicants for the job";
-//     response.applicants = matchedApplicants;
-//     res.json({ ...response });
-//   } catch (error) {
-//     console.log(error);
-//     response.success = false;
-//     response.message = "Failed to match applicants";
-//     res.status(500).json({ ...response });
-//   }
-// });
-
-// Get matched applicants for a specific job using cosine
 router.get("/:jobId/matchApplicants/cosine", validateToken, async (req, res) => {
   const jobId = req.params.jobId;
-  let response = {};
 
   try {
     const job = await Job.findById(jobId);
     if (!job) {
-      response.message = "Job not found";
-      return res.status(404).customJson(response);
+      return res.customError(404, { success: false, message: "Job not found" });
     }
 
-    const applicants = await Application.find({
-      job: jobId,
-      status: "applied",
-    }).populate("user");
+    const applicants = await Application.find({ job: jobId, status: "applied" }).populate("user");
 
     const matchedApplicants = [];
     const rejectedApplicants = [];
     const shortlistedApplicants = [];
 
     for (const applicant of applicants) {
-      const { similarity, matchedSkills, status, reason } = cosineSimilarity(
-        job,applicant
-      );
+      const { similarity, matchedSkills, status, reason } = cosineSimilarity(job, applicant);
 
       const updatedApplicant = {
         ...applicant.toObject(),
@@ -209,7 +128,6 @@ router.get("/:jobId/matchApplicants/cosine", validateToken, async (req, res) => 
       if (status === "matched") {
         matchedApplicants.push(updatedApplicant);
       } else if (status === "rejected") {
-        // Update the status to "rejected"
         applicant.status = "rejected";
         await applicant.save();
         rejectedApplicants.push(updatedApplicant);
@@ -218,22 +136,17 @@ router.get("/:jobId/matchApplicants/cosine", validateToken, async (req, res) => 
       }
     }
 
-    // Sort the shortlisted applicants based on similarity score or matched skills (choose one criterion)
-    // Example: Sort by similarity score in descending order
     shortlistedApplicants.sort((a, b) => b.similarity - a.similarity);
 
-    response.success = true;
-    response.matchedApplicants = matchedApplicants;
-    response.rejectedApplicants = rejectedApplicants;
-    response.shortlistedApplicants = shortlistedApplicants;
-    res.customJson(response);
+    return res.customJson({
+      success: true,
+      matchedApplicants,
+      rejectedApplicants,
+      shortlistedApplicants,
+    });
   } catch (error) {
     console.log(error);
-    response.success = false;
-    response.message = "Failed while matching applicants";
-    res.status(500).customJson(response);
+    return res.customError(500, { success: false, message: "Failed to match applicants" });
   }
 });
-
-
 module.exports = router;

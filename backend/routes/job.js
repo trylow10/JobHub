@@ -20,17 +20,18 @@ router.post("/create", validateToken, async (req, res) => {
       return res.customError(404, { ...response, signature: signature(response) });
     }
 
-    if (!user.roles.includes("jobPoster")) {
-      // Add "jobPoster" role to the user
-      user.roles.push("jobPoster");
-      await user.save();
-    }
+    // if (!user.roles.includes("jobPoster")) {
+    //   // Add "jobPoster" role to the user
+    //   user.roles.push("jobPoster");
+    //   await user.save();
+    // }
 
     const job = await Job.create({
       ...req.body,
       jobPoster: userId,
     });
 
+    console.log(req.body)
     response.success = true;
     response.message = "Job created successfully";
     res.status(201).customJson({ ...response, signature: signature(response) });
@@ -62,6 +63,33 @@ router.get("/allJobs", validateToken, async (req, res) => {
     response.success = false;
     response.message = "Job retrieval failed";
     res.status(500).customJson({ ...response, signature: signature(response) });
+  }
+});
+
+//get recommended jobs
+router.get("/recommendedJobs", validateToken, async (req, res) => {
+  const userId = req.body.activeSessionId;
+  let response = {};
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      response.message = "User not found";
+      return res.status(404).json({ ...response });
+    }
+
+    const userSkills = user.skills;
+    const jobs = await Job.find({ skills: { $all: userSkills } });
+
+    response.success = true;
+    response.message = "Recommended jobs for the user";
+    response.jobs = jobs;
+    res.json({ ...response });
+  } catch (error) {
+    console.log(error);
+    response.success = false;
+    response.message = "Failed to retrieve recommended jobs";
+    res.status(500).json({ ...response });
   }
 });
 
@@ -123,20 +151,29 @@ router.get("/:jobId", validateToken, async (req, res) => {
 // Update a job by ID
 router.put("/:jobId", validateToken, async (req, res) => {
   const jobId = req.params.jobId;
+  const userId = req.body.activeSessionId; // Assuming the user ID is available in the request body
   const response = {};
 
   try {
+    const job = await Job.findById(jobId);
+    if (!job) {
+      response.success = false;
+      response.message = "Job not found";
+      return res.status(404).customJson({ ...response, signature: signature(response) });
+    }
+
+    // Check if the user is the job poster
+    if (job.jobPoster.toString() !== userId) {
+      response.success = false;
+      response.message = "Unauthorized access";
+      return res.status(403).customJson({ ...response, signature: signature(response) });
+    }
+
     const updatedJob = await Job.findByIdAndUpdate(
       jobId,
       { ...req.body },
       { new: true }
     );
-
-    if (!updatedJob) {
-      response.success = false;
-      response.message = "Job not found";
-      return res.status(404).customJson({ ...response, signature: signature(response) });
-    }
 
     response.success = true;
     response.message = "Job updated successfully";
@@ -180,6 +217,25 @@ router.delete("/:jobId", validateToken, async (req, res) => {
     console.log(error);
     response.success = false;
     response.message = "Failed to delete job";
+    res.status(500).customJson({ ...response, signature: signature(response) });
+  }
+});
+
+router.get("/jobs", validateToken, async (req, res) => {
+  const userId = req.user.id;
+  let response = {};
+
+  try {
+    const jobs = await Job.find({ jobPoster: userId });
+
+    response.success = true;
+    response.message = "User's jobs";
+    response.jobs = jobs;
+    res.customJson({ ...response, signature: signature(response) });
+  } catch (error) {
+    console.log(error);
+    response.success = false;
+    response.message = "Failed to retrieve user's jobs";
     res.status(500).customJson({ ...response, signature: signature(response) });
   }
 });

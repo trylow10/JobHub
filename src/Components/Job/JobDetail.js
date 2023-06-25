@@ -14,7 +14,7 @@ import {
   JobType,
   ApplyJobButton
 } from "../Job/Styles/JobDetails";
-
+import { Link } from "react-router-dom"; 
 const JobDetailComponent = () => {
   const { id } = useParams();
   const [job, setJob] = useState({});
@@ -42,6 +42,7 @@ const JobDetailComponent = () => {
   }
 
   return (
+    <div className="flex">
     <JobDetailWrapper>
       <Title>{job.title}</Title>
       <Description>Description: {job.description}</Description>
@@ -51,8 +52,11 @@ const JobDetailComponent = () => {
       <JobType>Job Type: {job.jobType}</JobType>
       <Skills>Skills: {job.skills.join(", ")}</Skills>
       <PostedBy>Posted by: {job.jobPoster.name}</PostedBy>
-      <ApplyJobButton >Apply Now</ApplyJobButton>
+      <Link to={`/application/${job._id}/apply`}>
+      <ApplyJobButton>Apply Now</ApplyJobButton>
+      </Link>
     </JobDetailWrapper>
+    </div>
   );
 };
 

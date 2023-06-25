@@ -3,13 +3,13 @@ import styled from "styled-components";
 export const JobListWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 12px;
   padding: 0 2rem;
-  margin: 2rem 0;
+  margin: 2rem  6rem 2rem 28rem;
 `;
 
 export const JobListItemWrapper = styled.div`
-  width: 300px;
+  width: 280px;
   min-height: 300px;
   padding: 16px;
   display: flex;
@@ -21,7 +21,7 @@ export const JobListItemWrapper = styled.div`
 `;
 
 export const JobListHeading = styled.div`
-  text-align: center;
+  margin-left:50%;
   font-size: 24px;
   font-weight: 600;
 `;

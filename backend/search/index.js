@@ -97,7 +97,8 @@ router.get("/", async (req, res) => {
 
 router.get("/suggest", async (req, res) => {
   const { q, limit = 10, from = 0 } = req.query;
-  const query = typeof q === "string" ? q.toLowerCase() : String(q?.[0]?.toLowerCase());
+  const query =
+    typeof q === "string" ? q.toLowerCase() : String(q?.[0]?.toLowerCase());
 
   try {
     const searchResult = await suggestQuery(query, limit, from);
@@ -125,18 +126,19 @@ router.get("/suggest", async (req, res) => {
         text: bucket.key,
         type: "company",
       }));
-      
+
     suggestions.push(...companySuggestions);
-    const filteredSuggestions = suggestions.filter(suggestion => suggestion.text.toLowerCase().startsWith(query));
+    const filteredSuggestions = suggestions.filter((suggestion) =>
+      suggestion.text.toLowerCase().startsWith(query)
+    );
     // suggestions.push(...filteredSuggestions);
-    
+
     res.json({
       filteredSuggestions,
       q: query,
       from: Number(from),
       limit: String(limit),
     });
-
   } catch (error) {
     console.error("An error occurred while suggesting:", error);
     res.status(500).send("An error occurred while suggesting");
