@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import {
   DeleteJobButton,
   EditJobButton,
@@ -13,18 +12,17 @@ const ManageJobSection = () => {
   const [editMode, setEditMode] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [jobData, setJobData] = useState(null);
-  const [userJobs, setUserJobs] = useState([]);
-  const { id } = useParams();
+  const [jobData, setJobData] = useState([]);
 
-  const handleEditJob = async (updatedJobData) => {
+  console.log(jobData);
+
+  const handleEditJob = async (updatedJobData, jobId) => {
     try {
-      const response = await fetch(`${API}/api/jobs/${id}`, {
+      const response = await fetch(`${API}/api/job/${jobId}?token=${localStorage.getItem("token")}`, {
         method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(updatedJobData),
       });
@@ -36,19 +34,18 @@ const ManageJobSection = () => {
       setSuccessMessage("Job updated successfully");
       setEditMode(false);
     } catch (error) {
-      setErrorMessage("Failed to update job");
+      setErrorMessage("Failed to update job", error);
       console.error("Failed to update job:", error);
     }
   };
 
-  const handleDeleteJob = async () => {
+  const handleDeleteJob = async (jobId) => {
     try {
-      const response = await fetch(`${API}/api/jobs/${id}`, {
+      const response = await fetch(`${API}/api/job/${jobId}?token=${localStorage.getItem("token")}`, {
         method: "DELETE",
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
         },
       });
 
@@ -58,34 +55,28 @@ const ManageJobSection = () => {
 
       setSuccessMessage("Job deleted successfully");
     } catch (error) {
-      setErrorMessage("Failed to delete job");
+      setErrorMessage("Failed to delete job", error);
       console.error("Failed to delete job:", error);
     }
   };
 
-  const handleViewApplicants = async () => {
+  const handleViewApplicants = async (jobId) => {
     try {
-      const response = await fetch(`${API}/api/jobs`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(`${API}/api/job/${jobId}/applicants?token=${localStorage.getItem("token")}`);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch jobs");
+        throw new Error("Failed to fetch applicants");
       }
 
       const data = await response.json();
 
-      console.log("Jobs:", data);
+      console.log("Applicants:", data);
     } catch (error) {
-      console.error("Failed to fetch jobs:", error);
+      console.error("Failed to fetch applicants:", error);
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event, jobId) => {
     event.preventDefault();
     const updatedJobData = {
       title: event.target.title.value,
@@ -98,20 +89,13 @@ const ManageJobSection = () => {
       skills: event.target.skills.value.split(","),
     };
 
-    handleEditJob(updatedJobData);
+    handleEditJob(updatedJobData, jobId);
   };
 
   useEffect(() => {
     const fetchJobData = async () => {
       try {
-        const response = await fetch(`${API}/api/jobs/${id}`, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
+        const response = await fetch(`${API}/api/job/my-jobs?token=${localStorage.getItem("token")}`);
         if (!response.ok) {
           throw new Error("Failed to fetch job data");
         }
@@ -124,31 +108,6 @@ const ManageJobSection = () => {
     };
 
     fetchJobData();
-  }, [id]);
-
-  useEffect(() => {
-    const fetchUserJobs = async () => {
-      try {
-        const response = await fetch(`${API}/api/my-jobs`, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user jobs");
-        }
-
-        const data = await response.json();
-        setUserJobs(data);
-      } catch (error) {
-        console.error("Failed to fetch user jobs:", error);
-      }
-    };
-
-    fetchUserJobs();
   }, []);
 
   useEffect(() => {
@@ -160,39 +119,54 @@ const ManageJobSection = () => {
     return () => clearTimeout(timer);
   }, [successMessage, errorMessage]);
 
+  // Wait for jobData to be fetched before rendering the component
+  if (jobData.length === 0) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <ManageJobWrapper>
-      <ManageJobListItemWrapper>
-        <ManageJobListHeading>{jobData?.title || "Job Title"}</ManageJobListHeading>
-        <div>
-          <div>Description: {jobData?.description || "Lorem ipsum dolor sit amet."}</div>
-          <div>Location: {jobData?.location || "New York, NY"}</div>
-          <div>Posted: {jobData?.postedDate || "June 25, 2023"}</div>
-        </div>
-        <div>
-          {editMode ? (
-            <form onSubmit={handleSubmit}>
-              <input type="text" name="title" defaultValue={jobData?.title} placeholder="Job Title" />
-              {/* Add other input fields */}
-              <button type="submit">Save</button>
-            </form>
-          ) : (
-            <>
-              <EditJobButton onClick={() => setEditMode(true)}>
-                Edit Job
-              </EditJobButton>
-              <DeleteJobButton onClick={handleDeleteJob}>
-                Delete Job
-              </DeleteJobButton>
-              <button onClick={handleViewApplicants}>View Applicants</button>
-            </>
-          )}
-        </div>
-        {successMessage && <div>{successMessage}</div>}
-        {errorMessage && <div>{errorMessage}</div>}
-      </ManageJobListItemWrapper>
+      {jobData.jobs.map((job) => (
+        <ManageJobListItemWrapper key={job._id}>
+          <ManageJobListHeading>Title: {job.title}</ManageJobListHeading>
+          <div>
+            <div>Description: {job.description}</div>
+            <div>Location: {job.jobLocation}</div>
+            <div>Posted: {job.username}</div>
+          </div>
+          <div>
+            {editMode ? (
+              <form onSubmit={(event) => handleSubmit(event, job._id)}>
+                <input
+                  type="text"
+                  name="title"
+                  defaultValue={job.title}
+                  placeholder="Job Title"
+                />
+                {/* Add other input fields */}
+                <button type="submit">Save</button>
+              </form>
+            ) : (
+              <>
+                <EditJobButton onClick={() => setEditMode(true)}>
+                  Edit Job
+                </EditJobButton>
+                <DeleteJobButton onClick={() => handleDeleteJob(job._id)}>
+                  Delete Job
+                </DeleteJobButton>
+                <button onClick={() => handleViewApplicants(job._id)}>
+                  View Applicants
+                </button>
+              </>
+            )}
+          </div>
+          {successMessage && <div>{successMessage}</div>}
+          {errorMessage && <div>{errorMessage}</div>}
+        </ManageJobListItemWrapper>
+      ))}
     </ManageJobWrapper>
   );
+  
 };
 
 export default ManageJobSection;

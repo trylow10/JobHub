@@ -67,6 +67,41 @@ router.get("/allJobs", validateToken, async (req, res) => {
   }
 });
 
+router.get("/my-jobs", validateToken, async (req, res) => {
+  const userId = req.body.activeSessionId; // Assuming the user ID is available in the request body
+  let response = {};
+
+  try {
+
+    const user = await User.findById(userId); // Retrieve the user document based on the user ID
+    if (!user) {
+      response.success = false;
+      response.message = 'User not found';
+      return res.customJson({ ...response, signature: signature(response) });
+    }
+
+    const jobsWithUsername = await Job.find({ jobPoster: userId });
+
+    const jobs = jobsWithUsername.map(job => {
+      return {
+        ...job.toObject(),
+        username: user.uname // Add the username field to each job object
+      };
+    });
+    response.success = true;
+    response.message = "User's jobs";
+    response.jobs = jobs;
+    response.username = user.username; // Add the username to the response object
+
+    res.customJson({ ...response, signature: signature(response) });
+  } catch (error) {
+    console.log(error);
+    response.success = false;
+    response.message = "Failed to retrieve user's jobs";
+    res.status(500).customJson({ ...response, signature: signature(response) });
+  }
+});
+
 //get recommended jobs
 router.get("/recommendedJobs", validateToken, async (req, res) => {
   const userId = req.body.activeSessionId;
@@ -100,7 +135,7 @@ router.get("/followersJobs", validateToken, async (req, res) => {
   let response = {};
 
   try {
-    const user = await User.findById(userId).populate("followers");
+    const user = await User.findById(userId);
 
     if (!user) {
       response.success = false;
@@ -108,12 +143,12 @@ router.get("/followersJobs", validateToken, async (req, res) => {
       return res.customError(404, { ...response, signature: signature(response) });
     }
 
-    const followerIds = user.followers.map((follower) => follower._id);
+    const networkIds = user.network; // Assuming the user's network is stored as an array of IDs in the 'network' field
 
-    const jobs = await Job.find({ jobPoster: { $in: followerIds } });
+    const jobs = await Job.find({ jobPoster: { $in: networkIds } });
 
     response.success = true;
-    response.message = "Jobs posted by user's followers";
+    response.message = "Jobs posted by user's network";
     response.jobs = jobs;
     res.customJson({ ...response, signature: signature(response) });
   } catch (error) {
@@ -220,25 +255,5 @@ router.delete("/:jobId", validateToken, async (req, res) => {
     res.status(500).customJson({ ...response, signature: signature(response) });
   }
 });
-
-router.get("/my-jobs", validateToken, async (req, res) => {
-  const userId = req.body.activeSessionId; // Assuming the user ID is available in the request body
-  let response = {};
-
-  try {
-    const jobs = await Job.find({ jobPoster: userId });
-
-    response.success = true;
-    response.message = "User's jobs";
-    response.jobs = jobs;
-    res.customJson({ ...response, signature: signature(response) });
-  } catch (error) {
-    console.log(error);
-    response.success = false;
-    response.message = "Failed to retrieve user's jobs";
-    res.status(500).customJson({ ...response, signature: signature(response) });
-  }
-});
-
 
 module.exports = router;

@@ -128,7 +128,7 @@ const JobList = () => {
         </JobListWrapper>
       </div>
       <div>
-        <JobListHeading>Jobs from Your Followers</JobListHeading>
+        <JobListHeading>Jobs from Your Connection</JobListHeading>
         <JobListWrapper>
           {followersJobs.length > 0 ? (
             followersJobs.map((job) => (
@@ -144,7 +144,7 @@ const JobList = () => {
               </JobListItemWrapper>
             ))
           ) : (
-            <div>No jobs from your followers found.</div>
+            <div>No jobs from your connection.</div>
           )}
         </JobListWrapper>
       </div>
