@@ -42,3 +42,8 @@ export const Select = styled.select`
   padding: 10px;
   margin-bottom: 10px;
 `;
+export const ErrorMessage = styled.div`
+  color: red;
+  font-size: 14px;
+  margin-bottom: 5px;
+`;

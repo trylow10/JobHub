@@ -58,10 +58,8 @@ const userSchema = mongoose.Schema({
     default: [],
   },
   roles: {
-    type: String,
-    required: true,
-    enum: ["jobSeeker", "jobPoster"],
-    default: "jobSeeker",
+    type: [String],
+    default: ['jobSeeker']
   },
   skills: {
     type: [String],

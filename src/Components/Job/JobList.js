@@ -8,7 +8,7 @@ import {
   JobListInfo,
 } from "./Styles/JobListStyled";
 import { Link } from "react-router-dom";
-import { Container, Section } from "./Styles/JobSidebar";
+import { Container, Section } from "./Styles/JobSidebarStyled";
 import UserInfo from "../Feed/UserInfo";
 
 const JobList = () => {

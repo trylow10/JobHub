@@ -20,11 +20,12 @@ router.post("/create", validateToken, async (req, res) => {
       return res.customError(404, { ...response, signature: signature(response) });
     }
 
-    // if (!user.roles.includes("jobPoster")) {
-    //   // Add "jobPoster" role to the user
-    //   user.roles.push("jobPoster");
-    //   await user.save();
-    // }
+    console.log(user.roles);
+    if (!user.roles.includes("jobPoster")) {
+      // Add "jobPoster" role to the user
+      user.roles.push("jobPoster");
+      await user.save();
+    }
 
     const job = await Job.create({
       ...req.body,
@@ -187,7 +188,6 @@ router.put("/:jobId", validateToken, async (req, res) => {
   }
 });
 
-
 router.delete("/:jobId", validateToken, async (req, res) => {
   const jobId = req.params.jobId;
   const userId = req.body.activeSessionId;
@@ -221,8 +221,8 @@ router.delete("/:jobId", validateToken, async (req, res) => {
   }
 });
 
-router.get("/jobs", validateToken, async (req, res) => {
-  const userId = req.user.id;
+router.get("/my-jobs", validateToken, async (req, res) => {
+  const userId = req.body.activeSessionId; // Assuming the user ID is available in the request body
   let response = {};
 
   try {
