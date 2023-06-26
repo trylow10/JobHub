@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { API } from "../../env";
 import {
-  JobDetailWrapper,
+  StyledJobDetailComponent,
+  JobDetailContainer,
   Title,
   Description,
   Company,
@@ -12,13 +13,15 @@ import {
   PostedBy,
   JobLocation,
   JobType,
-  ApplyJobButton
+  ApplyJobButton,
 } from "../Job/Styles/JobDetails";
-import { Link } from "react-router-dom"; 
+import JobApplyForm from "./JobApplyForm"
+
 const JobDetailComponent = () => {
   const { id } = useParams();
   const [job, setJob] = useState({});
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const fetchJobDetail = async () => {
@@ -37,26 +40,32 @@ const JobDetailComponent = () => {
     fetchJobDetail();
   }, [id]);
 
+  const handleApplyClick = () => {
+    setShowForm(true);
+  };
+
   if (loading) {
     return <LoadingText>Loading...</LoadingText>;
   }
 
   return (
-    <div className="flex">
-    <JobDetailWrapper>
-      <Title>{job.title}</Title>
-      <Description>Description: {job.description}</Description>
-      <Company>Company: {job.company}</Company>
-      <Workplace>Workplace: {job.workPlace}</Workplace>
-      <JobLocation>Job Location: {job.jobLocation}</JobLocation>
-      <JobType>Job Type: {job.jobType}</JobType>
-      <Skills>Skills: {job.skills.join(", ")}</Skills>
-      <PostedBy>Posted by: {job.jobPoster.name}</PostedBy>
-      <Link to={`/application/${job._id}/apply`}>
-      <ApplyJobButton>Apply Now</ApplyJobButton>
-      </Link>
-    </JobDetailWrapper>
-    </div>
+    <StyledJobDetailComponent>
+      <JobDetailContainer>
+        <Title>Title: {job.title}</Title>
+        <Description>Description: {job.description}</Description>
+        <Company>Company: {job.company}</Company>
+        <Workplace>Workplace: {job.workPlace}</Workplace>
+        <JobLocation>Job Location: {job.jobLocation}</JobLocation>
+        <JobType>Job Type: {job.jobType}</JobType>
+        <Skills>Skills: {job.skills.join(", ")}</Skills>
+        <PostedBy>Posted by: {job.jobPoster.name}</PostedBy>
+        {!showForm ? (
+          <ApplyJobButton onClick={handleApplyClick}>Apply Now</ApplyJobButton>
+        ) : (
+          <JobApplyForm jobId={job._id} />
+        )}
+      </JobDetailContainer>
+    </StyledJobDetailComponent>
   );
 };
 

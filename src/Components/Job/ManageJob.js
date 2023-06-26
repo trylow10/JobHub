@@ -7,37 +7,13 @@ import {
   ManageJobWrapper,
 } from "./Styles/ManageJobStyled";
 import { API } from "../../env";
+import { Link } from "react-router-dom";
 
 const ManageJobSection = () => {
-  const [editMode, setEditMode] = useState(false);
+  // const [editMode, setEditMode] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [jobData, setJobData] = useState([]);
-
-  console.log(jobData);
-
-  const handleEditJob = async (updatedJobData, jobId) => {
-    try {
-      const response = await fetch(`${API}/api/job/${jobId}?token=${localStorage.getItem("token")}`, {
-        method: "PUT",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedJobData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update job");
-      }
-
-      setSuccessMessage("Job updated successfully");
-      setEditMode(false);
-    } catch (error) {
-      setErrorMessage("Failed to update job", error);
-      console.error("Failed to update job:", error);
-    }
-  };
 
   const handleDeleteJob = async (jobId) => {
     try {
@@ -97,6 +73,10 @@ const ManageJobSection = () => {
       try {
         const response = await fetch(`${API}/api/job/my-jobs?token=${localStorage.getItem("token")}`);
         if (!response.ok) {
+              if (response.status === 403) {
+          // Unauthorized access
+          setErrorMessage("Unauthorized access");
+        }
           throw new Error("Failed to fetch job data");
         }
 
@@ -135,7 +115,7 @@ const ManageJobSection = () => {
             <div>Posted: {job.username}</div>
           </div>
           <div>
-            {editMode ? (
+            {/* {editMode ? (
               <form onSubmit={(event) => handleSubmit(event, job._id)}>
                 <input
                   type="text"
@@ -143,7 +123,6 @@ const ManageJobSection = () => {
                   defaultValue={job.title}
                   placeholder="Job Title"
                 />
-                {/* Add other input fields */}
                 <button type="submit">Save</button>
               </form>
             ) : (
@@ -158,7 +137,18 @@ const ManageJobSection = () => {
                   View Applicants
                 </button>
               </>
-            )}
+            )} */}
+            <Link to={`edit-job/${job._id}`}>
+            <EditJobButton onClick={() => setEditMode(true)}>
+                  Edit Job
+                </EditJobButton>
+            </Link>
+                <DeleteJobButton onClick={() => handleDeleteJob(job._id)}>
+                  Delete Job
+                </DeleteJobButton>
+                <button onClick={() => handleViewApplicants(job._id)}>
+                  View Applicants
+                </button>
           </div>
           {successMessage && <div>{successMessage}</div>}
           {errorMessage && <div>{errorMessage}</div>}

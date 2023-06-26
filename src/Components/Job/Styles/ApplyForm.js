@@ -1,32 +1,39 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const FormContainer = styled.div`
-  max-width: 400px;
-  margin: 0 auto;
+  /* Add container styles */
 `;
 
 export const FormGroup = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 `;
 
 export const Label = styled.label`
-  display: block;
-  margin-bottom: 5px;
   font-weight: bold;
+  margin-bottom: 8px;
 `;
 
 export const Input = styled.input`
-  width: 100%;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  width: 100%;
 `;
 
 export const Button = styled.button`
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
+  background-color: #0a66c2;
+  color: white;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 20px;
   cursor: pointer;
+`;
+
+export const FormTitle = styled.h2`
+  /* Add form title styles */
+`;
+
+export const ErrorMessage = styled.p`
+  color: red;
+  margin-bottom: 16px;
 `;

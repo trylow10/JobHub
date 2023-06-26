@@ -3,7 +3,7 @@ const express = require("express");
 const { validateToken } = require("../helper/token");
 const { signature } = require("../crypto/functions");
 const Job = require("../schema/job");
-const User = require("../schema/users")
+const User = require("../schema/users");
 const responseMiddleware = require("../helper/responseMiddleware");
 const router = express.Router();
 router.use(responseMiddleware);
@@ -17,10 +17,11 @@ router.post("/create", validateToken, async (req, res) => {
     if (!user) {
       response.success = false;
       response.message = "User not found";
-      return res.customError(404, { ...response, signature: signature(response) });
+      return res.customError(404, {
+        ...response,
+        signature: signature(response),
+      });
     }
-
-    console.log(user.roles);
     if (!user.roles.includes("jobPoster")) {
       // Add "jobPoster" role to the user
       user.roles.push("jobPoster");
@@ -31,8 +32,6 @@ router.post("/create", validateToken, async (req, res) => {
       ...req.body,
       jobPoster: userId,
     });
-
-    console.log(req.body)
     response.success = true;
     response.message = "Job created successfully";
     res.status(201).customJson({ ...response, signature: signature(response) });
@@ -72,27 +71,31 @@ router.get("/my-jobs", validateToken, async (req, res) => {
   let response = {};
 
   try {
-
     const user = await User.findById(userId); // Retrieve the user document based on the user ID
     if (!user) {
       response.success = false;
-      response.message = 'User not found';
+      response.message = "User not found";
       return res.customJson({ ...response, signature: signature(response) });
+    }
+    if (!user.roles.includes("jobPoster")) {
+      response.success = false;
+      response.message = "Unauthorized access";
+      return res
+        .status(403)
+        .customJson({ ...response, signature: signature(response) });
     }
 
     const jobsWithUsername = await Job.find({ jobPoster: userId });
-
-    const jobs = jobsWithUsername.map(job => {
+    const jobs = jobsWithUsername.map((job) => {
       return {
         ...job.toObject(),
-        username: user.uname // Add the username field to each job object
+        username: user.username, // Add the username field to each job object
       };
     });
+
     response.success = true;
     response.message = "User's jobs";
     response.jobs = jobs;
-    response.username = user.username; // Add the username to the response object
-
     res.customJson({ ...response, signature: signature(response) });
   } catch (error) {
     console.log(error);
@@ -140,11 +143,13 @@ router.get("/followersJobs", validateToken, async (req, res) => {
     if (!user) {
       response.success = false;
       response.message = "User not found";
-      return res.customError(404, { ...response, signature: signature(response) });
+      return res.customError(404, {
+        ...response,
+        signature: signature(response),
+      });
     }
 
-    const networkIds = user.network; // Assuming the user's network is stored as an array of IDs in the 'network' field
-
+    const networkIds = user.networks;
     const jobs = await Job.find({ jobPoster: { $in: networkIds } });
 
     response.success = true;
@@ -195,14 +200,18 @@ router.put("/:jobId", validateToken, async (req, res) => {
     if (!job) {
       response.success = false;
       response.message = "Job not found";
-      return res.status(404).customJson({ ...response, signature: signature(response) });
+      return res
+        .status(404)
+        .customJson({ ...response, signature: signature(response) });
     }
 
     // Check if the user is the job poster
     if (job.jobPoster.toString() !== userId) {
       response.success = false;
       response.message = "Unauthorized access";
-      return res.status(403).customJson({ ...response, signature: signature(response) });
+      return res
+        .status(403)
+        .customJson({ ...response, signature: signature(response) });
     }
 
     const updatedJob = await Job.findByIdAndUpdate(

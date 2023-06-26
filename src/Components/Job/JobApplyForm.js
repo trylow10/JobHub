@@ -1,29 +1,36 @@
-import React, { useState, useEffect, useParams } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
-  Button,
   FormContainer,
   FormGroup,
+  Label,
   Input,
-  Label
-} from "../Job/Styles/ApplyForm";
+  Button,
+ // Add SuccessMessage component import
+} from "./Styles/ApplyForm";
 import { API } from "../../env";
 
-const ApplyForm = () => {
+const JobApplyForm = () => {
   const [experience, setExperience] = useState("");
+    const [experienceError, setExperienceError] = useState("");
+
   const [company, setCompany] = useState("");
+  const [companyError, setCompanyError] = useState("");
+
   const [workPlace, setWorkPlace] = useState("");
   const [jobLocation, setJobLocation] = useState("");
+  const [skills, setSkills] = useState([]);
+  const [skillsError, setSkillsError] = useState("");
+
+
   const { id } = useParams();
 
   useEffect(() => {
-    // Fetch user's existing values from the database and set them as initial values
     const fetchUserValues = async () => {
       try {
-        const response = await fetch(`${API}/api/user/basic`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const response = await fetch(
+          `${API}/api/user/basic?token=${localStorage.getItem("token")}`
+        );
 
         if (!response.ok) {
           const errorMessage = await response.text();
@@ -33,7 +40,7 @@ const ApplyForm = () => {
         const data = await response.json();
         const { experience, company, workPlace, jobLocation } = data.user;
 
-        setExperience(experience || "");
+        setExperience(experience);
         setCompany(company || "");
         setWorkPlace(workPlace || "");
         setJobLocation(jobLocation || "");
@@ -47,6 +54,16 @@ const ApplyForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Perform client-side form validation
+    if (!validateForm()) {
+      return;
+    }
+
+    // if (experience === "0") {
+    //   setWorkPlace("");
+    //   setJobLocation("");
+    //   setCompany("");
+    // }
 
     try {
       const response = await fetch(
@@ -77,9 +94,61 @@ const ApplyForm = () => {
       setCompany("");
       setWorkPlace("");
       setJobLocation("");
+      setSkills([]);
+
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
+  };
+
+  const handleSkillsChange = (e) => {
+    const inputSkills = e.target.value;
+    const selectedSkills = inputSkills.split(",").map((skill) => skill.trim());
+    setSkills(selectedSkills);
+  };
+
+
+  const validateForm = () => {
+    let isValid = true;
+
+  
+    // Validate experience field
+    if (
+      experience.trim() === "" ||
+      isNaN(Number(experience)) ||
+      Number(experience) < 0
+    ) {
+      setExperienceError("Experience must be a non-negative number");
+      isValid = false;
+    } else {
+      setExperienceError("");
+    }
+
+    // Validate company field
+    if (experience !== "0" && company.trim() === "") {
+      setCompanyError("Company is required");
+      isValid = false;
+    } else {
+      setCompanyError("");
+    }
+
+    // Validate job location field
+    if (jobLocation.trim() === "") {
+      setJobLocationError("Job location is required");
+      isValid = false;
+    } else {
+      setJobLocationError("");
+    }
+
+    // Validate skills field
+    if (skills.length === 0) {
+      setSkillsError("At least one skill is required");
+      isValid = false;
+    } else {
+      setSkillsError("");
+    }
+
+    return isValid;
   };
 
   return (
@@ -88,7 +157,8 @@ const ApplyForm = () => {
         <FormGroup>
           <Label>Experience:</Label>
           <Input
-            type="text"
+            type="number"
+            min={0}
             value={experience}
             onChange={(e) => setExperience(e.target.value)}
             placeholder="Enter your experience"
@@ -104,7 +174,7 @@ const ApplyForm = () => {
           />
         </FormGroup>
         <FormGroup>
-          <Label>Work Place:</Label>
+          <Label>Work Type:</Label>
           <Input
             type="text"
             value={workPlace}
@@ -127,4 +197,4 @@ const ApplyForm = () => {
   );
 };
 
-export default ApplyForm;
+export default JobApplyForm;
