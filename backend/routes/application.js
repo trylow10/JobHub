@@ -68,15 +68,19 @@ router.post("/:jobId/apply", validateToken, async (req, res) => {
 // Get applicants for a specific job
 router.get("/:jobId/applicants", validateToken, async (req, res) => {
   const jobId = req.params.jobId;
-  
+  const userId = req.body.activeSessionId;
+
   try {
     const job = await Job.findById(jobId);
     if (!job) {
       return res.customError(404, { success: false, message: "Job not found" });
     }
 
-    if (job.postedBy !== req.user._id) {
-      return res.customError(403, { success: false, message: "Access denied. Only job posters can view applicants" });
+    if (job.jobPoster.toString() !== userId.toString()) {
+      return res.status(403).customJson({
+        success: false,
+        message: "Access denied. Only job posters can view applicants",
+      });
     }
 
     const applications = await Application.find({ job: jobId }).populate("user");
@@ -99,13 +103,16 @@ router.get("/:jobId/applicants", validateToken, async (req, res) => {
   }
 });
 
-router.get("/:jobId/matchApplicants/cosine", validateToken, async (req, res) => {
+router.get("/:jobId/cosine", validateToken, async (req, res) => {
   const jobId = req.params.jobId;
 
   try {
     const job = await Job.findById(jobId);
     if (!job) {
-      return res.customError(404, { success: false, message: "Job not found" });
+      return res.customError(404, {
+        success: false,
+        message: "Job not found",
+      });
     }
 
     const applicants = await Application.find({ job: jobId, status: "applied" }).populate("user");

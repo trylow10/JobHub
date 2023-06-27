@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const FormContainer = styled.div`
   /* Add container styles */
@@ -31,6 +31,11 @@ export const Button = styled.button`
 
 export const FormTitle = styled.h2`
   /* Add form title styles */
+`;
+
+export const SuccessMessage = styled.p`
+  color: green;
+  margin-bottom: 16px;
 `;
 
 export const ErrorMessage = styled.p`

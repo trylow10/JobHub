@@ -18,6 +18,10 @@ export const ManageJobListItemWrapper = styled.div`
   gap: 18px;
   border: 1px solid gray;
   border-radius: 20px;
+  .view-applicants{
+    display:flex;
+    justify-content:space-between;
+  }
 `;
 
 export const ManageJobListHeading = styled.div`
@@ -37,10 +41,10 @@ export const EditJobButton = styled.button`
 `;
 
 export const DeleteJobButton = styled.button`
-  background-color: #0a66c2;
-  color: white;
+  color: red;
   font-weight: 600;
-  align-self: center;
+  font-size:18px;
+  margin-left:108px;
   padding: 12px 16px;
   border-radius: 20px;
   cursor: pointer;
@@ -61,3 +65,12 @@ export const JobListInfo = styled.div`
   flex-direction: column;
   gap: 18px;
 `;
+
+export const ViewApplicationBtn = styled.button`
+cursor:pointer;
+color:#0a66c2;
+font-size:18px;
+
+
+`;
+

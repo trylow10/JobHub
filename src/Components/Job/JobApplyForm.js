@@ -6,24 +6,28 @@ import {
   Label,
   Input,
   Button,
- // Add SuccessMessage component import
+  SuccessMessage,
 } from "./Styles/ApplyForm";
 import { API } from "../../env";
 
 const JobApplyForm = () => {
   const [experience, setExperience] = useState("");
-    const [experienceError, setExperienceError] = useState("");
+  const [experienceError, setExperienceError] = useState("");
 
   const [company, setCompany] = useState("");
   const [companyError, setCompanyError] = useState("");
 
   const [workPlace, setWorkPlace] = useState("");
   const [jobLocation, setJobLocation] = useState("");
+  const [jobLocationError, setJobLocationError] = useState("");
+
   const [skills, setSkills] = useState([]);
   const [skillsError, setSkillsError] = useState("");
 
-
   const { id } = useParams();
+
+  // Add success message state
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const fetchUserValues = async () => {
@@ -37,13 +41,9 @@ const JobApplyForm = () => {
           throw new Error(errorMessage);
         }
 
-        const data = await response.json();
-        const { experience, company, workPlace, jobLocation } = data.user;
-
-        setExperience(experience);
-        setCompany(company || "");
-        setWorkPlace(workPlace || "");
-        setJobLocation(jobLocation || "");
+        const userData = await response.json();
+        const { skills } = userData.user;
+        setSkills(skills ?? []);
       } catch (error) {
         console.log(error);
       }
@@ -59,15 +59,11 @@ const JobApplyForm = () => {
       return;
     }
 
-    // if (experience === "0") {
-    //   setWorkPlace("");
-    //   setJobLocation("");
-    //   setCompany("");
-    // }
-
     try {
       const response = await fetch(
-        `${API}/api/job/${id}/apply?token=${localStorage.getItem("token")}`,
+        `${API}/api/application/${id}/apply?token=${localStorage.getItem(
+          "token"
+        )}`,
         {
           method: "POST",
           headers: {
@@ -78,6 +74,7 @@ const JobApplyForm = () => {
             company,
             workPlace,
             jobLocation,
+            skills,
           }),
         }
       );
@@ -90,12 +87,14 @@ const JobApplyForm = () => {
       const data = await response.json();
       console.log(data);
 
+      // Display success message
+      setSuccessMessage("Job applied successfully!");
+
       setExperience("");
       setCompany("");
       setWorkPlace("");
       setJobLocation("");
       setSkills([]);
-
     } catch (error) {
       console.error(error);
     }
@@ -107,11 +106,9 @@ const JobApplyForm = () => {
     setSkills(selectedSkills);
   };
 
-
   const validateForm = () => {
     let isValid = true;
 
-  
     // Validate experience field
     if (
       experience.trim() === "" ||
@@ -125,7 +122,7 @@ const JobApplyForm = () => {
     }
 
     // Validate company field
-    if (experience !== "0" && company.trim() === "") {
+    if (company.trim() === "") {
       setCompanyError("Company is required");
       isValid = false;
     } else {
@@ -161,9 +158,11 @@ const JobApplyForm = () => {
             min={0}
             value={experience}
             onChange={(e) => setExperience(e.target.value)}
-            placeholder="Enter your experience"
+            placeholder="Enter Your experience"
           />
+          <span>{experienceError}</span>
         </FormGroup>
+
         <FormGroup>
           <Label>Company:</Label>
           <Input
@@ -172,6 +171,7 @@ const JobApplyForm = () => {
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Enter your company"
           />
+          <span>{companyError}</span>
         </FormGroup>
         <FormGroup>
           <Label>Work Type:</Label>
@@ -190,9 +190,21 @@ const JobApplyForm = () => {
             onChange={(e) => setJobLocation(e.target.value)}
             placeholder="Enter your job location"
           />
+          <span>{jobLocationError}</span>
+        </FormGroup>
+        <FormGroup>
+          <Label>Skills:</Label>
+          <Input
+            type="text"
+            value={skills.join(", ")}
+            onChange={handleSkillsChange}
+            placeholder="Enter your skills separated by commas"
+          />
+          <span>{skillsError}</span>
         </FormGroup>
         <Button type="submit">Apply</Button>
       </form>
+      {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
     </FormContainer>
   );
 };
