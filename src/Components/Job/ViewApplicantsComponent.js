@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { API } from "../../env";
+import { API, PROFILE_IMG } from "../../env";
 import { ViewApplicantWrapper } from "./Styles/ViewApplicatsComponentStyled";
 
 const ViewApplicantsComponent = () => {
@@ -59,21 +59,29 @@ const ViewApplicantsComponent = () => {
       <ViewApplicantWrapper>
         <table>
           <tr>
+            <th>Profile</th>
             <th>Name</th>
             <th>Email</th>
             <th>Previous Company</th>
-            <th>Preferred Job Location</th>
-            <th>User Experience In Years</th>
+            <th>Experience In Years</th>
             <th>User Skills</th>
-            <th>Cosine Similarity Status</th>
-            <th>Cosine Similarity Reason</th>
+            <th>Status</th>
+            <th>Reason</th>
           </tr>
           {applicants?.map((applicant, index) => (
             <tr key={applicant._id}>
+              <td>
+                {" "}
+                {applicant.profileImg && (
+                  <img
+                    src={applicant.profileImg ?? PROFILE_IMG}
+                    alt="Profile"
+                  />
+                )}
+              </td>
               <td>{applicant.uname}</td>
               <td>{applicant.email}</td>
               <td>{applicant.company}</td>
-              <td>{applicant.jobLocation}</td>
               <td>{applicant.experience}</td>
               <td>{applicant.skills.join(", ")}</td>
               <td>{cosineSimilarity[index]?.status}</td>
