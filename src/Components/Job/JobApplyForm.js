@@ -6,7 +6,9 @@ import {
   Label,
   Input,
   Button,
+  Select,
   SuccessMessage,
+  // ErrorMessage,
 } from "./Styles/ApplyForm";
 import { API } from "../../env";
 
@@ -17,7 +19,7 @@ const JobApplyForm = () => {
   const [company, setCompany] = useState("");
   const [companyError, setCompanyError] = useState("");
 
-  const [workPlace, setWorkPlace] = useState("");
+  const [workPlace, setWorkPlace] = useState("Onsite");
   const [jobLocation, setJobLocation] = useState("");
   const [jobLocationError, setJobLocationError] = useState("");
 
@@ -92,7 +94,7 @@ const JobApplyForm = () => {
 
       setExperience("");
       setCompany("");
-      setWorkPlace("");
+      setWorkPlace("Onsite");
       setJobLocation("");
       setSkills([]);
     } catch (error) {
@@ -174,13 +176,16 @@ const JobApplyForm = () => {
           <span>{companyError}</span>
         </FormGroup>
         <FormGroup>
-          <Label>Work Type:</Label>
-          <Input
-            type="text"
+          <Label>Job Type:</Label>
+          <Select
             value={workPlace}
             onChange={(e) => setWorkPlace(e.target.value)}
-            placeholder="Enter your work place"
-          />
+            required
+          >
+            <option value="Onsite">Onsite</option>
+            <option value="Remote">Remote</option>
+            <option value="Hybrid">Hybrid</option>
+          </Select>
         </FormGroup>
         <FormGroup>
           <Label>Job Location:</Label>

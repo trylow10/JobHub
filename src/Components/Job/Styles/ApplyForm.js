@@ -28,6 +28,12 @@ export const Button = styled.button`
   border-radius: 20px;
   cursor: pointer;
 `;
+export const Select = styled.select`
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+`;
 
 export const FormTitle = styled.h2`
   /* Add form title styles */

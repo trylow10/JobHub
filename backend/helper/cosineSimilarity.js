@@ -1,72 +1,28 @@
-
-function cosineSimilarity(job, user) {
+function cosineSimilarity(job, applicant) {
   const jobSkills = job.skills || [];
-  const userSkills = user.skills || [];
+  const userSkills = applicant?.user.skills || [];
   const jobExperience = job.experience || 0;
-  const jobCompany = job.company || "";
-  const jobWorkPlace = job.workPlace || "";
-  const jobLocation = job.jobLocation || "";
-  const jobType = job.jobType || "";
+  const userExperience = applicant.user.experience || 0;
 
-  const userExperience = user.experience || 0;
-  const userCompany = user.company || "";
-  const userWorkPlace = user.workPlace || "";
-  const userLocation = user.jobLocation || "";
-  const userJobType = user.jobType || "";
-
-  const fields = [
-    "skills",
-    "experience",
-    "company",
-    "workPlace",
-    "jobLocation",
-    "jobType",
-  ];
-
+  const fields = ["skills", "experience"];
   const fieldWeights = {
     skills: 0.8,
     experience: 0.5,
-    company: 0.2,
-    workPlace: 0.1,
-    jobLocation: 0.1,
-    jobType: 0.1,
   };
-
   const values = {
     skills: [...jobSkills, ...userSkills],
     experience: [jobExperience, userExperience],
-    company: [jobCompany, userCompany],
-    workPlace: [jobWorkPlace, userWorkPlace],
-    jobLocation: [jobLocation, userLocation],
-    jobType: [jobType, userJobType],
   };
 
-  // Calculate number of matched skills
   const matchedSkills = jobSkills.filter((skill) =>
     userSkills.includes(skill)
   ).length;
 
-  // Calculate dot product
   const dotProduct = calculateDotProduct(fields, fieldWeights, values);
 
-  // Calculate magnitudes
-  const magnitude1 = Math.sqrt(
-    jobSkills.length * jobExperience ** 2 +
-      fieldWeights["company"] ** 2 +
-      fieldWeights["workPlace"] ** 2 +
-      fieldWeights["jobLocation"] ** 2 +
-      fieldWeights["jobType"] ** 2
-  );
+  const magnitude1 = Math.sqrt(jobExperience ** 2);
+  const magnitude2 = Math.sqrt(userExperience ** 2);
 
-  const magnitude2 = Math.sqrt(
-    userSkills.length * userExperience ** 2 +
-      fieldWeights["company"] ** 2 +
-      fieldWeights["workPlace"] ** 2 +
-      fieldWeights["jobLocation"] ** 2 +
-      fieldWeights["jobType"] ** 2
-  );
-
-  // Check if magnitudes are 0
   if (magnitude1 === 0 || magnitude2 === 0 || matchedSkills === 0) {
     return {
       similarity: 0,
@@ -76,10 +32,8 @@ function cosineSimilarity(job, user) {
     };
   }
 
-  // Calculate cosine similarity
   let similarity = dotProduct / (magnitude1 * magnitude2);
   similarity = Math.min(similarity, 1);
-
   similarity = isNaN(similarity) ? 0 : similarity;
 
   if (similarity <= 0.07) {
@@ -123,89 +77,80 @@ function calculateDotProduct(fields, fieldWeights, values) {
       const userValue = fieldValues[1].toString();
       const fieldValueMatch = jobValue === userValue ? 1 : 0;
       dotProduct += fieldWeight * fieldValueMatch;
-
-      // Additional check for matching user experience with job type, location, workplace, and company
-      if (
-        field === "experience" ||
-        field === "jobType" ||
-        field === "jobLocation" ||
-        field === "workPlace" ||
-        field === "company"
-      ) {
-        const jobFieldValue = fieldValues[0].toString().toLowerCase();
-        const userFieldValue = fieldValues[1].toString().toLowerCase();
-        const fieldValueMatch = jobFieldValue === userFieldValue ? 1 : 0;
-        dotProduct += fieldWeight * fieldValueMatch;
-      }
     }
   }
   return dotProduct;
 }
 
-// // Example usage:
-// const job3 = {
-//   skills: ["python", "django"],
-//   experience: 4.5,
-//   company: "DEF Solutions",
-//   workPlace: "Remote",
-//   jobLocation: "Berlin",
-//   jobType: "Freelance",
+module.exports = {
+  cosineSimilarity,
+};
+
+// Example case 1: High similarity score and additional skills
+// `const job1 = {
+//   skills: ["xaina"],
+//   experience: 1,
 // };
 
-// const user3 = {
-//   skills: ["python", "django", "postgresql"],
-//   experience: 4,
-//   company: "GHI Corporation",
-//   workPlace: "Hybrid",
-//   jobLocation: "Berlin",
-//   jobType: "Full-time",
+// const user1 = {
+//   skills: ["xaina"],
+//   experience: 1,
 // };
 
-// const result3 = cosineSimilarity(job3, user3);
-// console.log(result3);
+// const result1 = cosineSimilarity(job1, user1);
+// console.log("Case 1:", result1);`
+// /*
+// Output:
+// {
+//   similarity: 1,
+//   matchedSkills: 3,
+//   status: "matched",
+//   reason: "High similarity score and user has additional skills"
+// }
+// */
 
+// // Example case 2: Low similarity score
 // const job2 = {
-//   skills: ["javascript", "react", "node"],
-//   experience: 3,
-//   company: "DEF Solutions",
-//   workPlace: "Remote",
-//   jobLocation: "Berlin",
-//   jobType: "Freelance",
+//   skills: ["python", "django"],
+//   experience: 4,
 // };
 
 // const user2 = {
-//   skills: ["python", "django"],
-//   experience: 4,
-//   company: "GHI Corporation",
-//   workPlace: "Office",
-//   jobLocation: "Berlin",
-//   jobType: "Full-time",
+//   skills: ["javascript", "react"],
+//   experience: 2,
 // };
 
 // const result2 = cosineSimilarity(job2, user2);
-// console.log(result2);
+// console.log("Case 2:", result2);
+// /*
+// Output:
+// {
+//   similarity: 0,
+//   matchedSkills: 0,
+//   status: "rejected",
+//   reason: "Low similarity score"
+// }
+// */
 
-// const job5 = {
-//   skills: ["python", "django"],
+// // Example case 3: Insufficient skills or empty skill set
+// const job3 = {
+//   skills: ["java"],
+//   experience: 5,
+// };
+
+// const user3 = {
+//   skills: ["java","skill"],
 //   experience: 3,
-//   company: "XYZ Corporation",
-//   workPlace: "Office",
-//   jobLocation: "London",
-//   jobType: "Full-time",
 // };
 
-// const user5 = {
-//   skills: ["python"],
-//   experience: 0,
-//   company: "ABC Solutions",
-//   workPlace: "Office",
-//   jobLocation: "London",
-//   jobType: "Full-time",
-// };
-
-// const result5 = cosineSimilarity(job5, user5);
-// console.log(result5);
-
-module.exports ={
-  cosineSimilarity
-}
+// const result3 = cosineSimilarity(job3, user3);
+// console.log("Case 3:", result3);
+// /*
+// Output:
+// {
+//   similarity: 0,
+//   matchedSkills: 0,
+//   status: "rejected",
+//   reason: "Insufficient skills or empty skill set"
+// }
+// */

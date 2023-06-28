@@ -4,6 +4,7 @@ const { validateToken } = require("../helper/token");
 const { signature } = require("../crypto/functions");
 const Job = require("../schema/job");
 const User = require("../schema/users");
+const Application = require("../schema/application");
 const responseMiddleware = require("../helper/responseMiddleware");
 const router = express.Router();
 router.use(responseMiddleware);
@@ -44,10 +45,17 @@ router.post("/create", validateToken, async (req, res) => {
 });
 // Get all jobs
 router.get("/allJobs", validateToken, async (req, res) => {
+  const userId = req.body.activeSessionId || req.user.id; // Assuming the user ID is available in req.user.id after token validation
   let response = {};
 
   try {
-    const jobs = await Job.find().populate("jobPoster");
+    // Retrieve all jobs except the ones already applied by the user
+    const appliedJobs = await Application.find({ applicant: userId }).distinct(
+      "job"
+    );
+    const jobs = await Job.find({ _id: { $nin: appliedJobs } }).populate(
+      "jobPoster"
+    );
 
     if (jobs.length === 0) {
       response.message = "No jobs found";
@@ -107,7 +115,7 @@ router.get("/my-jobs", validateToken, async (req, res) => {
 
 //get recommended jobs
 router.get("/recommendedJobs", validateToken, async (req, res) => {
-  const userId = req.body.activeSessionId;
+  const userId = req.body.activeSessionId || req.user.id; // Assuming the user ID is available in req.user.id after token validation
   let response = {};
 
   try {
@@ -118,7 +126,13 @@ router.get("/recommendedJobs", validateToken, async (req, res) => {
     }
 
     const userSkills = user.skills;
-    const jobs = await Job.find({ skills: { $all: userSkills } });
+    const appliedJobs = await Application.find({ applicant: userId }).distinct(
+      "job"
+    );
+    const jobs = await Job.find({
+      skills: { $all: userSkills },
+      _id: { $nin: appliedJobs },
+    });
 
     response.success = true;
     response.message = "Recommended jobs for the user";

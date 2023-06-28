@@ -182,6 +182,7 @@ const EditJobForm = () => {
           value={experience}
           onChange={(e) => setExperience(e.target.value)}
         />
+        {experienceError && <ErrorMessage>{experienceError}</ErrorMessage>}
 
         <Label htmlFor="company">Company</Label>
         <Input

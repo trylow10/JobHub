@@ -24,11 +24,22 @@ router.post("/:jobId/apply", validateToken, async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.customError(404, { success: false, message: "User not found" });
+      return res.customError(404, {
+        success: false,
+        message: "User not found",
+      });
     }
 
-    const existingApplication = await Application.findOne({ job: jobId, user: userId });
-    if (existingApplication && ["applied", "rejected", "shortlisted", "matched"].includes(existingApplication.status)) {
+    const existingApplication = await Application.findOne({
+      job: jobId,
+      user: userId,
+    });
+    if (
+      existingApplication &&
+      ["applied", "rejected", "shortlisted", "matched"].includes(
+        existingApplication.status
+      )
+    ) {
       const errorMessage = {
         applied: "You have already applied for this job",
         rejected: "Your application for this job has been rejected",
@@ -60,10 +71,12 @@ router.post("/:jobId/apply", validateToken, async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.customError(500, { success: false, message: "Failed to apply for the job" });
+    return res.customError(500, {
+      success: false,
+      message: "Failed to apply for the job",
+    });
   }
 });
-
 
 // Get applicants for a specific job
 router.get("/:jobId/applicants", validateToken, async (req, res) => {
@@ -83,10 +96,17 @@ router.get("/:jobId/applicants", validateToken, async (req, res) => {
       });
     }
 
-    const applications = await Application.find({ job: jobId }).populate("user");
+    const applications = await Application.find({ job: jobId }).populate(
+      "user"
+    );
 
     if (!applications || applications.length === 0) {
-      return res.status(404).customJson({ success: false, message: "No applicants found for the job" });
+      return res
+        .status(404)
+        .customJson({
+          success: false,
+          message: "No applicants found for the job",
+        });
     }
 
     const applicants = applications.map((application) => application.user);
@@ -99,7 +119,9 @@ router.get("/:jobId/applicants", validateToken, async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).customJson({ success: false, message: "Failed to retrieve applicants" });
+    return res
+      .status(500)
+      .customJson({ success: false, message: "Failed to retrieve applicants" });
   }
 });
 
@@ -115,45 +137,39 @@ router.get("/:jobId/cosine", validateToken, async (req, res) => {
       });
     }
 
-    const applicants = await Application.find({ job: jobId, status: "applied" }).populate("user");
-
-    const matchedApplicants = [];
-    const rejectedApplicants = [];
-    const shortlistedApplicants = [];
+    const applicants = await Application.find({
+      job: jobId,
+    }).populate("user");
 
     for (const applicant of applicants) {
-      const { similarity, matchedSkills, status, reason } = cosineSimilarity(job, applicant);
+      const { similarity, matchedSkills, status, reason } = cosineSimilarity(
+        job,
+        applicant
+      );
 
-      const updatedApplicant = {
-        ...applicant.toObject(),
+      applicant.cosineSimilarity = {
         similarity,
         matchedSkills,
         status,
         reason,
       };
 
-      if (status === "matched") {
-        matchedApplicants.push(updatedApplicant);
-      } else if (status === "rejected") {
-        applicant.status = "rejected";
-        await applicant.save();
-        rejectedApplicants.push(updatedApplicant);
-      } else {
-        shortlistedApplicants.push(updatedApplicant);
-      }
-    }
+      applicant.status = status;
 
-    shortlistedApplicants.sort((a, b) => b.similarity - a.similarity);
+      await applicant.save();
+    }
 
     return res.customJson({
       success: true,
-      matchedApplicants,
-      rejectedApplicants,
-      shortlistedApplicants,
+      applicants,
     });
   } catch (error) {
     console.log(error);
-    return res.customError(500, { success: false, message: "Failed to match applicants" });
+    return res.customError(500, {
+      success: false,
+      message: "Failed to match applicants",
+    });
   }
 });
+
 module.exports = router;
