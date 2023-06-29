@@ -13,8 +13,8 @@ import { NavMenuWebDB } from "../extra/NavMenuDB";
 
 // Styled Components
 import { Container, Logo, SearchContainer } from "./Styles/HeaderStyled";
-import { SearchBox, NavLink, Divider } from "./Styles/HeaderStyled";
-
+import { NavLink, Divider } from "./Styles/HeaderStyled";
+import SearchForm from "../search/searchFormComponent";
 // ENV
 import { API, PROFILE_IMG } from "../../env";
 
@@ -50,7 +50,10 @@ const WebHeader = ({ token }) => {
   const logout = async () => {
     const responce = await fetch(`${API}/api/user/logout?token=${token}`, {
       method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
     });
     const data = await responce.json();
     if (!data.success) {
@@ -66,16 +69,12 @@ const WebHeader = ({ token }) => {
 
   return (
     <>
+      {!logged && <Navigate to="/" />}
       <SearchContainer>
-        {!logged && <Navigate to="/login" />}
         <Logo to="/" onClick={(e) => updateFeed(e, "home")}>
           <img src="/images/home-logo.svg" alt="" />
         </Logo>
-        <SearchBox>
-          <i className="fa-solid fa-magnifying-glass" />
-          <input placeholder="Search" type="text" />
-          <span>Search</span>
-        </SearchBox>
+        <SearchForm />
       </SearchContainer>
 
       <NavLink>
@@ -109,12 +108,20 @@ const WebHeader = ({ token }) => {
 
         <button className="icon-div me-btn">
           <i className="fa-solid fa-user" />
-          <span>Me <i className="fa-solid fa-caret-down" /></span>
+          <span>
+            Me <i className="fa-solid fa-caret-down" />
+          </span>
 
           <ul className="dropdown-box">
-            <li className="profile" onClick={userUpdate}>Profile</li>
-            <Link className="posts" to="/post">Posts</Link>
-            <li className="logout" onClick={logout}>Logout</li>
+            <li className="profile" onClick={userUpdate}>
+              Profile
+            </li>
+            <Link className="posts" to="/post">
+              Posts
+            </Link>
+            <li className="logout" onClick={logout}>
+              Logout
+            </li>
           </ul>
         </button>
 
@@ -143,17 +150,12 @@ const MobileHeader = () => {
       <SearchContainer>
         <button className="icon-div profile">
           <img
-            src={(userInfo.profile || PROFILE_IMG)+"?tr=w-100,h-100"}
+            src={(userInfo.profile || PROFILE_IMG) + "?tr=w-100,h-100"}
             alt=""
             onClick={userUpdate}
           />
         </button>
-
-        <SearchBox>
-          <i className="fa-solid fa-magnifying-glass" />
-          <input placeholder="Search" type="text" />
-        </SearchBox>
-
+        <SearchForm />
         <Link className="message" onClick={activate} to="/post">
           <i className="fa-solid fa-check-to-slot" />
         </Link>

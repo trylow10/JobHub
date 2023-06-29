@@ -9,7 +9,6 @@ import Welcome from "./Pages/Welcome";
 import Feed from "./Pages/Feed";
 import ForgetPass from "./Pages/ForgetPass";
 import Register from "./Pages/Register";
-import Login from "./Pages/Login";
 import Post from "./Pages/Post";
 import Job from "./Pages/Job";
 import JobDetail from "./Pages/JobDetail";
@@ -48,7 +47,6 @@ function App() {
           <Route path="/forget-pass" element={<ForgetPass />} />
           <Route path="/join-now" element={<Register />} />
           <Route path="/post" element={<Post />} />
-          <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
     </div>

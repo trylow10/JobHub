@@ -10,11 +10,7 @@ import Header from "../Components/Welcome/Header";
 
 //TODO:forget pass ko view
 // Styled Components
-import {
-  InputContainer,
-  PrimaryBtn,
-  SecondaryBtn,
-} from "../Components/Feed/Styles/FormPageStyled.js";
+import { InputContainer } from "../Components/Feed/Styles/FormPageStyled.js";
 
 // ENV
 import { API } from "../env";
@@ -123,8 +119,12 @@ const ForgetPass = () => {
               placeholder="username or email"
             />
             {err && <p className="error">{err}</p>}
-            <PrimaryBtn type="submit">next</PrimaryBtn>
-            <SecondaryBtn onClick={hideUserName}>back</SecondaryBtn>
+            <button type="submit" className="forget-pass">
+              next
+            </button>
+            <button className="back" onClick={hideUserName}>
+              <i class="fa-sharp fa-light fa-arrow-left"></i>
+            </button>
           </form>
         )}
 
@@ -147,16 +147,20 @@ const ForgetPass = () => {
               onClick={clear}
             />
             {err && <p className="error">{err}</p>}
-            <span
+            <div
               className="resend"
               onClick={() => {
                 checkUserName(correctName);
               }}
             >
-              Didn't Got? Resend Code
-            </span>
-            <PrimaryBtn type="submit">next</PrimaryBtn>
-            <SecondaryBtn onClick={hideCode}>back</SecondaryBtn>
+              Didn't Gt? Resend Code
+            </div>
+            <button type="submit" className="forget-pass">
+              next
+            </button>
+            <button type="submit" className="forget-pass" onClick={hideCode}>
+              <i class="fa-sharp fa-light fa-arrow-left"></i>
+            </button>
           </form>
         )}
 
@@ -177,8 +181,12 @@ const ForgetPass = () => {
               placeholder="New Password"
             />
             {err && <p className="error">{err}</p>}
-            <PrimaryBtn id="reset">Reset Password</PrimaryBtn>
-            <SecondaryBtn onClick={hidePass}>back</SecondaryBtn>
+            <button className="forget-pass" id="reset">
+              Reset Password
+            </button>
+            <button onClick={hidePass} className="forget-pass">
+              <i class="fa-sharp fa-light fa-arrow-left"></i>
+            </button>
           </form>
         )}
       </InputContainer>

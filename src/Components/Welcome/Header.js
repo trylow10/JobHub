@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 // Styled Components
-import { Nav, NavLink, Register, Login } from "./Styles/HeaderStyled";
+import { Nav, NavLink, Login } from "./Styles/HeaderStyled";
 
 const Header = ({ hidden }) => {
   return (
@@ -39,11 +39,7 @@ const Header = ({ hidden }) => {
           </>
         )}
 
-        {/* Login/Register Button */}
-        <Register className="register" to="/join-now">
-          Join now
-        </Register>
-        <Login to="/login">Sign in</Login>
+        <Login to="/join-now">Join Now</Login>
       </NavLink>
     </Nav>
   );

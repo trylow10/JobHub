@@ -7,7 +7,8 @@ export const InputContainer = styled.div`
   padding: 32px;
   max-width: 400px;
   margin: 0 auto;
-
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  border: 1px solid #f7f7f7;
   label {
     font-size: 14px;
     font-weight: 600;
@@ -129,7 +130,7 @@ export const GoogleBtn = styled.button`
   transition: background-color 0.3s;
   display: flex;
   align-items: center;
-
+  justify-content: center;
   &:hover {
     background-color: #f2f2f2;
   }

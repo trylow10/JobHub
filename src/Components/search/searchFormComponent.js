@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
-  Container,
-  Input,
+  SearchWrapper,
   SuggestionList,
   SuggestionItem,
 } from "./Style/SearchStyle";
+import { SearchBox } from "../Feed/Styles/HeaderStyled";
 import { API, HEADLINE, PROFILE_IMG } from "../../env";
 
 const SearchForm = () => {
@@ -53,7 +52,6 @@ const SearchForm = () => {
         const response = await fetch(`${API}/api/search?q=${searchQuery}`);
         const data = await response.json();
 
-        console.log("---", data.hits);
         setSearchResults(data.hits);
         setSuggestions([]); // Clear suggestions when search results are displayed
       } catch (error) {
@@ -65,82 +63,90 @@ const SearchForm = () => {
     }
   };
 
-  const handleSearchButtonClick = () => {
-    handleSearch(query);
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch(query);
+    }
   };
 
   return (
     <div>
-      <Container>
-        <Input
-          type="text"
-          value={query}
-          onChange={handleQueryChange}
-          placeholder="Search"
-        />
-        <Button onClick={handleSearchButtonClick}>Search</Button>
-      </Container>
+      <SearchWrapper>
+        <SearchBox>
+          <i
+            className="fa-solid fa-magnifying-glass"
+            onClick={() => handleSearch(query)}
+          />
+          <input
+            placeholder="Search"
+            type="text"
+            value={query}
+            onChange={handleQueryChange}
+            onKeyPress={handleKeyPress}
+          />
+        </SearchBox>
 
-      {suggestions.length > 0 && (
-        <SuggestionList>
-          {suggestions.map((suggestion) => (
-            <SuggestionItem
-              key={suggestion.text}
-              onClick={() => handleSuggestionClick(suggestion)}
-            >
-              {suggestion.text}
-            </SuggestionItem>
-          ))}
-        </SuggestionList>
-      )}
+        {suggestions.length > 0 && (
+          <SuggestionList>
+            {suggestions.map((suggestion) => (
+              <SuggestionItem
+                key={suggestion.text}
+                onClick={() => handleSuggestionClick(suggestion)}
+              >
+                {suggestion.text}
+              </SuggestionItem>
+            ))}
+          </SuggestionList>
+        )}
 
-      {searchResults.length > 0 && (
-        <div>
-          <h2>Search Results</h2>
+        {searchResults.length > 0 && (
           <div>
-            <h3>Users</h3>
-            <ul>
-              {searchResults
-                .filter((result) => result.type === "user")
-                .map((result, index) => (
-                  <li key={index}>
-                    <div>
-                      <img
-                        src={result.profileImg || PROFILE_IMG}
-                        alt="User Profile"
-                        style={{ width: "100px", height: "100px" }}
-                      />
-                      <p>Username: {result.uname}</p>
-                      <p>Headline: {result.headline || HEADLINE}</p>
-                      <p>Email: {result.email}</p>
-                      <p>Skills: {result.skills}</p>
-                    </div>
-                  </li>
-                ))}
-            </ul>
+            <h2>Search Results</h2>
+            <div>
+              <h3>Users</h3>
+              <ul>
+                {searchResults
+                  .filter((result) => result.type === "user")
+                  .map((result, index) => (
+                    <li key={index}>
+                      <div>
+                        <img
+                          src={result.profileImg || PROFILE_IMG}
+                          alt="User Profile"
+                          style={{ width: "100px", height: "100px" }}
+                        />
+                        <p>Username: {result.uname}</p>
+                        <p>Headline: {result.headline || HEADLINE}</p>
+                        <p>Email: {result.email}</p>
+                        <p>Skills: {result.skills}</p>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+            <div>
+              <h3>Jobs</h3>
+              <ul>
+                {searchResults
+                  .filter((result) => result.type === "job")
+                  .map((result, index) => (
+                    <li key={index}>
+                      <div>
+                        <p>Title: {result.title}</p>
+                        <p>Description: {result.description}</p>
+                        <p>Company: {result.company}</p>
+                        <p>Workplace: {result.workPlace}</p>
+                        <p>Job Location: {result.jobLocation}</p>
+                        <p>Job Type: {result.jobType}</p>
+                        <p>Skills: {result.skills}</p>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            </div>
           </div>
-          <div>
-            <h3>Jobs</h3>
-            <ul>
-              {searchResults
-                .filter((result) => result.type === "job")
-                .map((result, index) => (
-                  <li key={index}>
-                    <div>
-                      <p>Title: {result.title}</p>
-                      <p>Description: {result.description}</p>
-                      <p>Company: {result.company}</p>
-                      <p>Workplace: {result.workPlace}</p>
-                      <p>Job Location: {result.jobLocation}</p>
-                      <p>Job Type: {result.jobType}</p>
-                      <p>Skills: {result.skills}</p>
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          </div>
-        </div>
-      )}
+        )}
+      </SearchWrapper>
     </div>
   );
 };

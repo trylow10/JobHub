@@ -1,7 +1,20 @@
 import styled from "styled-components";
-export const Container = styled.div`
+
+export const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
+  justify-content: center;
   align-items: center;
+  z-index: 999;
+`;
+
+export const SearchWrapper = styled.div`
+  position: relative;
 `;
 
 export const Input = styled.input`
@@ -24,8 +37,28 @@ export const Button = styled.button`
 
 export const SuggestionList = styled.ul`
   margin-top: 16px;
+  position: absolute;
+  top: 100%; /* Adjust this value to position the suggestions properly */
+  left: 0;
   padding: 0;
   list-style: none;
+  z-index: 99;
+  width: 240px;
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #a0aec0;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #edf2f7;
+    border-radius: 3px;
+  }
 `;
 
 export const SuggestionItem = styled.li`

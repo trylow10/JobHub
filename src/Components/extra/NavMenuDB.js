@@ -6,13 +6,6 @@ export const NavMenuWebDB = [
     fabIcon: true,
     to: "/feed",
   },
-  {
-    name: "search",
-    value: "search",
-    iconLink: "fa-solid fa-house-chimney",
-    fabIcon: true,
-    to: "/search",
-  },
   { name: "my network", iconLink: "fa-solid fa-user-group", fabIcon: true },
   {
     name: "jobs",

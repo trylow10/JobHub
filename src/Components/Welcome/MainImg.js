@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 
 // Redux
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { update } from "../../app/slice/userSlice"; // redux
+import { Navigate } from "react-router-dom";
 
 // Styled Components
 import {
@@ -14,7 +15,7 @@ import {
   SignInGoogle,
   Container,
   LeftSide,
-  RightSide
+  RightSide,
 } from "./Styles/MainImgStyled";
 
 // ENV
@@ -23,11 +24,12 @@ import { API } from "../../env";
 function MainImg() {
   const dispatch = useDispatch();
 
+  const user = useSelector((state) => state.user);
   // shows error msg for this form
   const [err, setErr] = useState("");
-  // stores value of password input type
+  // hide and show - confirm-pass
   const [passInputType, setPassInputType] = useState("password");
-
+  const [userLogged, setUserLogged] = useState(user.token);
 
   useEffect(() => {
     // All Input Fields
@@ -38,11 +40,9 @@ function MainImg() {
     [userInput, passInput].forEach((field) => {
       field.addEventListener("click", (e) => {
         e.currentTarget.classList.remove("wrong");
-        setErr("");
       });
     });
-  }, [])
-
+  }, []);
 
   // change password input type
   const toggleInputType = (e) => {
@@ -55,15 +55,15 @@ function MainImg() {
     }
   };
 
-  // When form is submited
+  // When Login form is submited
   const login = async () => {
     const userInput = document.getElementById("username");
-    const passInput =  document.getElementById("password");
+    const passInput = document.getElementById("password");
     const userName = userInput.value;
     const password = passInput.value;
 
     // preventing bad requests
-    if(!userName || !password) return;
+    if (!userName || !password) return;
 
     // Login API call
     const response = await fetch(
@@ -76,7 +76,7 @@ function MainImg() {
     // if error occured
     if (!data.success) {
       setErr(data.error.msg);
-      if (data.error.code === 2 || data.error.code === 0) {
+      if (data.error.code === 2) {
         userInput.classList.add("wrong");
       } else if (data.error.code === 3) {
         passInput.classList.add("wrong");
@@ -85,9 +85,10 @@ function MainImg() {
     }
 
     // set recieved user token
-    localStorage.setItem("token", data.token);;
+    localStorage.setItem("token", data.token);
     // set user id
-    dispatch(update({ id: data.userId, token: data.token }));
+    setUserLogged(true);
+    dispatch(update({ id: data.userId }));
   };
 
   return (
@@ -131,6 +132,7 @@ function MainImg() {
       <RightSide>
         <img loading="lazy" src="/images/welcome-hero.svg" alt="" />
       </RightSide>
+      {userLogged && <Navigate to={"/feed"} />}
     </Container>
   );
 }

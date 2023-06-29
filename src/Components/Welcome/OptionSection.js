@@ -16,9 +16,8 @@ import {
 // Individual Option Component
 const OptionComponent = (props) => {
   const { option, doBlue } = props;
-  //TODO:yaho yo props
-  // if (!option) return null;
 
+  if (!option) return null;
   return (
     <Option className={`option ${doBlue ? "blue" : ""}`} to="/">
       {option}

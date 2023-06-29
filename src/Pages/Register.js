@@ -56,14 +56,21 @@ const Register = () => {
     );
   };
 
-  const singup = async (e) => {
+  const signup = async (e) => {
     e.preventDefault();
 
     const userName = document.getElementById("username");
     const email = document.getElementById("email");
     const pass = document.getElementById("password");
+    const confirmPass = document.getElementById("confirm-password");
 
     if (!userName.value || !email.value || !pass.value) {
+      return;
+    }
+
+    if (pass.value !== confirmPass.value) {
+      setErr("Confirm Password does not match");
+      confirmPass.classList.add("wrong");
       return;
     }
 
@@ -187,12 +194,17 @@ const Register = () => {
       <Header hidden={true} />
       <InputContainer>
         {!correctInfo && (
-          <form className="holder" onSubmit={singup}>
+          <form className="holder" onSubmit={signup}>
             <label htmlFor="username">Register</label>
             <p>Join your professional community</p>
             <input type="text" id="username" placeholder="Username" />
             <input type="email" id="email" placeholder="Email" />
-            <input type={passInputType} id="password" placeholder="Password" />
+            <input
+              type={passInputType}
+              id="password"
+              placeholder="Password"
+              required
+            />
             <div className="pass-container">
               <input
                 required
@@ -209,13 +221,13 @@ const Register = () => {
               Register
             </PrimaryBtn>
             <Divider className="button-divider">or</Divider>
-            <GoogleBtn type="submit" onClick={singup}>
+            <GoogleBtn type="submit" onClick={signup}>
               <img src="/images/google.svg" alt="" />
               <span>Sing in with Google</span>
             </GoogleBtn>
-            <p>
+            <p style={{ marginTop: "24px" }}>
               Already a member?{" "}
-              <LinkBtn to="/login" className="link">
+              <LinkBtn to="/" className="link">
                 Login
               </LinkBtn>
             </p>
@@ -234,7 +246,9 @@ const Register = () => {
               id="code"
               placeholder="XXXX"
             />
-            <strong onClick={resendCode}>Didn't Receive? Resend Code</strong>
+            <div style={{ marginBottom: "12px" }} onClick={resendCode}>
+              Didn't Receive? Resend Code
+            </div>
             {err && <p className="error">{err}</p>}
             <PrimaryBtn type="submit">Let's Go</PrimaryBtn>
           </form>

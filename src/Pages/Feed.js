@@ -230,18 +230,18 @@ const Feed = () => {
 
   return (
     <Container id="feed-container">
-      {!localStorage.getItem("token") && <Navigate to="/login" />}
+      {!localStorage.getItem("token") && <Navigate to="/" />}
       <UserUpdate
         token={userToken}
         userInfo={userInfo}
         getUserInfo={getUserInfo}
       />
       <Header />
-      <button className="scroll-top">
+      {/* <button className="scroll-top">
         <a href="#feed-container">
           <i className="fa-solid fa-circle-arrow-up"></i>
         </a>
-      </button>
+      </button> */}
       {feed.show === "home" && <Explore userUpdate={getUserInfo} />}
       {feed.show === "my network" && <Network userUpdate={getUserInfo} />}
     </Container>

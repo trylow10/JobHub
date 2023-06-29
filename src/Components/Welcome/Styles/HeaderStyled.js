@@ -6,7 +6,7 @@ export const Nav = styled.nav`
   max-width: var(--container-size);
   margin: 0 auto;
   padding: 3rem 3rem 2rem;
-  margin-bottom: 2.5rem;
+  // margin-bottom: 2.5rem;
   display: flex;
   justify-content: space-between;
   height: 10vh;
@@ -45,7 +45,6 @@ export const Nav = styled.nav`
     }
   }
 `;
-
 
 export const NavLink = styled.div`
   display: flex;
@@ -128,7 +127,6 @@ export const Login = styled(Button)`
   margin: 0 0.5rem;
   border-radius: 20px;
   letter-spacing: 1px;
-  width: 100px;
   transition: background-color, box-shadow;
   transition-duration: 167ms;
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
