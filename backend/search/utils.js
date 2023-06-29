@@ -35,18 +35,18 @@ async function indexAllItems() {
     // Remove certain fields and convert object IDs to strings
     const trimData = allData.map((item) => {
       // Exclude unwanted fields from item
-      const { _id, pass, salt,profileImg,bgImg,jobPoster, __v, ...trimmedItem } = item;
+      const { _id, pass, salt, bgImg, jobPoster, __v, ...trimmedItem } = item;
 
       // Remove all array fields except for 'skills'
       for (const key in trimmedItem) {
-        if (Array.isArray(trimmedItem[key]) && key !== 'skills') {
+        if (Array.isArray(trimmedItem[key]) && key !== "skills") {
           delete trimmedItem[key];
         }
       }
 
       // Convert skills array to string
       if (Array.isArray(trimmedItem.skills)) {
-        trimmedItem.skills = trimmedItem.skills.join(', ');
+        trimmedItem.skills = trimmedItem.skills.join(", ");
       }
 
       // Convert object ID to string if found

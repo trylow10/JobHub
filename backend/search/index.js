@@ -66,7 +66,8 @@ router.get("/", async (req, res) => {
           uname: hit.uname,
           headline: hit.headline,
           email: hit.email,
-          roles: hit.roles,
+          skills: hit.skills,
+          profileImg: hit.profileImg,
         };
       } else {
         // Job result

@@ -8,6 +8,7 @@ import { Navigate } from "react-router-dom";
 // Functional Components
 import Header from "../Components/Welcome/Header";
 
+//TODO:forget pass ko view
 // Styled Components
 import {
   InputContainer,
@@ -65,17 +66,14 @@ const ForgetPass = () => {
     if (!newPass) {
       setErr("no password is given");
     }
-    const req = await fetch(
-      `${API}/api/user/forgot-pass/reset`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user: correctName, code: correctCode, newPass }),
-      }
-    );
+    const req = await fetch(`${API}/api/user/forgot-pass/reset`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user: correctName, code: correctCode, newPass }),
+    });
     const data = await req.json();
     if (!data.success) {
       setErr(data.error.msg);

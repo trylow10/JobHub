@@ -75,7 +75,7 @@ const JobList = () => {
             <p>
               <Link to={"/create-job"}>Post Job</Link>
             </p>
-              <i className="fa-solid fa-plus" />
+            <i className="fa-solid fa-plus" />
           </span>
           <span className="events">
             <p>

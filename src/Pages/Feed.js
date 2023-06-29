@@ -23,7 +23,11 @@ import UserUpdate from "../Components/Feed/UserUpdate";
 import UserPost from "../Components/Feed/UserPost";
 
 // Styled Components
-import { Container, ExploreHolder, NetworkHolder } from "../Components/Feed/Styles/ExplorePostStyled.js";
+import {
+  Container,
+  ExploreHolder,
+  NetworkHolder,
+} from "../Components/Feed/Styles/ExplorePostStyled.js";
 // ENV
 import { API } from "../env";
 
@@ -172,7 +176,7 @@ const Feed = () => {
   const userToken = useSelector((state) => state.user?.token);
   const dispatch = useDispatch();
   dispatch(fetchToken());
-  dispatch(posting({show: false}))
+  dispatch(posting({ show: false }));
 
   const getUserInfo = async () => {
     const token = localStorage.getItem("token");
@@ -185,7 +189,7 @@ const Feed = () => {
       console.log(data.error);
       return;
     }
-    console.log(data)
+    console.log(data);
     setUserInfo({
       uname: data.user.uname,
       headline: data.user.headline || "Hi! I am using linkedin",
@@ -199,7 +203,7 @@ const Feed = () => {
           headline: data.user.headline || "Hi! I am using linkedin",
           profile: data.user.profileImg,
           bg: data.user.bgImg,
-          id: data.user._id
+          id: data.user._id,
         },
       })
     );
@@ -227,7 +231,11 @@ const Feed = () => {
   return (
     <Container id="feed-container">
       {!localStorage.getItem("token") && <Navigate to="/login" />}
-      <UserUpdate token={userToken} userInfo={userInfo} getUserInfo={getUserInfo} />
+      <UserUpdate
+        token={userToken}
+        userInfo={userInfo}
+        getUserInfo={getUserInfo}
+      />
       <Header />
       <button className="scroll-top">
         <a href="#feed-container">

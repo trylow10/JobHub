@@ -32,7 +32,7 @@ function MainImg() {
   useEffect(() => {
     // All Input Fields
     const userInput = document.getElementById("username");
-    const passInput =  document.getElementById("password");
+    const passInput = document.getElementById("password");
 
     // Removing Red fields if any
     [userInput, passInput].forEach((field) => {
@@ -117,6 +117,7 @@ function MainImg() {
           {err && <p className="error">{err}</p>}
         </InputDiv>
 
+        {/* TODO: login functionality*/}
         <SingUp type="submit" onClick={login}>
           Login
         </SingUp>

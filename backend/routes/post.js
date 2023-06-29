@@ -108,6 +108,45 @@ Router.get("/one", validateToken, async (req, res) => {
   return res.json({ ...responce, signature: signature(responce) });
 });
 
+// Router.get("/recommended", validateToken, async (req, res) => {
+//   const userId = req.query.userId || req.body.activeSessionId;
+//   const response = {};
+
+//   try {
+//     // Find the user
+//     const user = await User.findOne({ _id: userId });
+//     if (!user) {
+//       response["success"] = false;
+//       response["error"] = { msg: "User not found", code: 10 };
+//       return res.json({ ...response, signature: signature(response) });
+//     }
+
+//     // Get the user's following users
+//     const followingUsers = user.following || [];
+
+//     // Find recommended posts that match the user's related posts' hashtags
+//     const recommendedPosts = await Post.find({
+//       $or: [
+//         { _id: { $in: user.recommendedPosts } }, // Posts recommended based on user's activity
+//         { _id: { $in: followingUsers } }, // Posts from users the user is following
+//         { hashtags: { $in: user.hashtags } }, // Posts with matching hashtags
+//       ],
+//       _id: { $ne: userId }, // Exclude the user's own posts
+//     })
+//       .sort({ _id: -1 }) // Sort by descending order of post ID
+//       .limit(5) // Retrieve a maximum of 5 recommended posts
+//       .lean(); // Convert documents to plain JavaScript objects
+
+//     response["success"] = true;
+//     response["userId"] = userId;
+//     response["recommendedPosts"] = recommendedPosts;
+//     return res.json({ ...response, signature: signature(response) });
+//   } catch (error) {
+//     console.error("Error fetching recommended posts:", error);
+//     res.status(500).json({ success: false, error: { msg: "Internal server error" } });
+//   }
+// });
+
 Router.get("/recommended", validateToken, async (req, res) => {
   const userId = req.query.userId || req.body.activeSessionId;
   const response = {};
@@ -135,15 +174,25 @@ Router.get("/recommended", validateToken, async (req, res) => {
     })
       .sort({ _id: -1 }) // Sort by descending order of post ID
       .limit(5) // Retrieve a maximum of 5 recommended posts
+      .populate("userId", "profilePicture") // Populate the userId field with the profilePicture property
+      .select("userId text hashtags") // Select the userId, text, and hashtags fields
       .lean(); // Convert documents to plain JavaScript objects
+
+    const recommendedProfiles = recommendedPosts.map((post) => ({
+      profilePicture: post.userId.profilePicture,
+      postText: post.text,
+      hashtags: post.hashtags,
+    }));
 
     response["success"] = true;
     response["userId"] = userId;
-    response["recommendedPosts"] = recommendedPosts;
+    response["recommendedProfiles"] = recommendedProfiles;
     return res.json({ ...response, signature: signature(response) });
   } catch (error) {
     console.error("Error fetching recommended posts:", error);
-    res.status(500).json({ success: false, error: { msg: "Internal server error" } });
+    res
+      .status(500)
+      .json({ success: false, error: { msg: "Internal server error" } });
   }
 });
 
@@ -151,7 +200,7 @@ Router.get("/recommended", validateToken, async (req, res) => {
 
 Router.post("/", validateToken, async (req, res) => {
   const userId = req.body.activeSessionId;
-  const postTxt = req.body.text || '';
+  const postTxt = req.body.text || "";
   const postImgs = req.body.postImgs || [];
   const response = {};
   if (!postTxt && postImgs.length === 0) {
@@ -159,7 +208,6 @@ Router.post("/", validateToken, async (req, res) => {
     response["error"] = { msg: "Either give text or imgs", code: 14 };
     return res.json({ ...response, signature: signature(response) });
   }
-
 
   const newPost = {};
 
@@ -221,8 +269,8 @@ Router.post("/", validateToken, async (req, res) => {
       }
       return acc;
     }, []);
-    
-        // Update hashtags in the User collection
+
+    // Update hashtags in the User collection
     await User.findOneAndUpdate(
       { _id: userId },
       { $addToSet: { hashtags: { $each: hashtags } } }

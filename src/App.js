@@ -17,7 +17,8 @@ import CreateJob from "./Pages/CreateJob";
 import ManageJob from "./Pages/ManageJob";
 import EditJob from "./Pages/EditJob";
 import ViewApplicant from "./Pages/ViewApplicant";
-
+import SearchPage from "./Pages/SearchPage";
+import RecommendedPost from "./Pages/RecomendedPost";
 function App() {
   const dispatch = useDispatch();
 
@@ -35,6 +36,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Welcome />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/recommend" element={<RecommendedPost />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/job" element={<Job />} />
           <Route path="/job/:id" element={<JobDetail />} />

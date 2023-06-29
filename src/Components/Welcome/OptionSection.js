@@ -16,7 +16,8 @@ import {
 // Individual Option Component
 const OptionComponent = (props) => {
   const { option, doBlue } = props;
-  if (!option) return;
+  //TODO:yaho yo props
+  // if (!option) return null;
 
   return (
     <Option className={`option ${doBlue ? "blue" : ""}`} to="/">
@@ -27,9 +28,9 @@ const OptionComponent = (props) => {
 
 // Main Component
 const OptionSection = (props) => {
-  const { heading, optionTitle, options, firstblue } = props;
+  const { heading, optionTitle, options = [], firstblue } = props; // Add default value for options
 
-  // how many options should initially visible
+  // how many options should initially be visible
   const VISIBLE_OPTIONS = 8;
 
   // Options Initially Visible (without clicking show-more)
