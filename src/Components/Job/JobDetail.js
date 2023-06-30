@@ -58,7 +58,7 @@ const JobDetailComponent = () => {
         <JobLocation>Job Location: {job.jobLocation}</JobLocation>
         <JobType>Job Type: {job.jobType}</JobType>
         <Skills>Skills: {job.skills.join(", ")}</Skills>
-        <PostedBy>Posted by: {job.jobPoster.name}</PostedBy>
+        <PostedBy>Posted by: {job.jobPoster.uname}</PostedBy>
         {!showForm ? (
           <ApplyJobButton onClick={handleApplyClick}>Apply Now</ApplyJobButton>
         ) : (

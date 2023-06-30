@@ -179,7 +179,7 @@ const Suggestion = ({ update, info }) => {
         {info.length === 0 && (
           <div style={{ textAlign: "center", width: "100%" }}>
             <h4 style={{ width: "100%", marginBottom: ".8rem" }}>
-              ❌❌ Nothing Here, you got everyone 🙃🙃 ❌❌
+              Nothing Here, you got everyone
             </h4>
           </div>
         )}

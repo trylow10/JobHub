@@ -16,6 +16,7 @@ const JobList = () => {
   const [allJobs, setAllJobs] = useState([]);
   const [followersJobs, setFollowersJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchRecommendedJobs = async () => {
@@ -25,10 +26,14 @@ const JobList = () => {
             "token"
           )}`
         );
+        if (!response.ok) {
+          throw new Error("Failed to fetch recommended jobs");
+        }
         const data = await response.json();
         setRecommendedJobs(data.jobs);
       } catch (error) {
         console.error(error);
+        setError("Failed to fetch recommended jobs");
       }
     };
 
@@ -37,10 +42,14 @@ const JobList = () => {
         const response = await fetch(
           `${API}/api/job/allJobs?token=${localStorage.getItem("token")}`
         );
+        if (!response.ok) {
+          throw new Error("Failed to fetch all jobs");
+        }
         const data = await response.json();
         setAllJobs(data.jobs);
       } catch (error) {
         console.error(error);
+        setError("Failed to fetch all jobs");
       }
     };
 
@@ -49,11 +58,16 @@ const JobList = () => {
         const response = await fetch(
           `${API}/api/job/followersJobs?token=${localStorage.getItem("token")}`
         );
+        if (!response.ok) {
+          throw new Error("Failed to fetch followers' jobs");
+        }
         const data = await response.json();
         setFollowersJobs(data.jobs);
-        setLoading(false);
       } catch (error) {
         console.error(error);
+        setError("Failed to fetch followers' jobs");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -64,6 +78,10 @@ const JobList = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
@@ -94,7 +112,7 @@ const JobList = () => {
                 <JobListInfo>
                   <h3>{job.title}</h3>
                   <p>Description: {job.description}</p>
-                  <p>Posted by: {job.jobPoster.name}</p>
+                  <p>Posted by: {job.jobPoster.uname}</p>
                 </JobListInfo>
                 <Link to={`/job/${job._id}`} style={{ alignSelf: "center" }}>
                   <ApplyJobButton>See More</ApplyJobButton>
@@ -115,7 +133,7 @@ const JobList = () => {
                 <JobListInfo>
                   <h3>{job.title}</h3>
                   <p>Description: {job.description}</p>
-                  <p>Posted by: {job.jobPoster.name}</p>
+                  <p>Posted by: {job.jobPoster.uname}</p>
                 </JobListInfo>
                 <Link to={`/job/${job._id}`} style={{ alignSelf: "center" }}>
                   <ApplyJobButton>See More</ApplyJobButton>
@@ -136,7 +154,7 @@ const JobList = () => {
                 <JobListInfo>
                   <h3>{job.title}</h3>
                   <p>Description: {job.description}</p>
-                  <p>Posted by: {job.jobPoster.name}</p>
+                  <p>Posted by: {job.jobPoster.uname}</p>
                 </JobListInfo>
                 <Link to={`/job/${job._id}`} style={{ alignSelf: "center" }}>
                   <ApplyJobButton>See More</ApplyJobButton>

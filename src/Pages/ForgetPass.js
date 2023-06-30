@@ -8,7 +8,7 @@ import { Navigate } from "react-router-dom";
 // Functional Components
 import Header from "../Components/Welcome/Header";
 
-//TODO:forget pass ko view
+//TODO:icon forgot pass
 // Styled Components
 import { InputContainer } from "../Components/Feed/Styles/FormPageStyled.js";
 
@@ -123,7 +123,7 @@ const ForgetPass = () => {
               next
             </button>
             <button className="back" onClick={hideUserName}>
-              <i class="fa-sharp fa-light fa-arrow-left"></i>
+              <i className="fa-regular fa-arrow-left-long"></i>{" "}
             </button>
           </form>
         )}
@@ -159,7 +159,7 @@ const ForgetPass = () => {
               next
             </button>
             <button type="submit" className="forget-pass" onClick={hideCode}>
-              <i class="fa-sharp fa-light fa-arrow-left"></i>
+              <i className="fa-regular fa-arrow-left-long"></i>{" "}
             </button>
           </form>
         )}
@@ -185,7 +185,7 @@ const ForgetPass = () => {
               Reset Password
             </button>
             <button onClick={hidePass} className="forget-pass">
-              <i class="fa-sharp fa-light fa-arrow-left"></i>
+              <i className="fa-regular fa-arrow-left-long"></i>{" "}
             </button>
           </form>
         )}

@@ -125,6 +125,12 @@ const WebHeader = ({ token }) => {
           </ul>
         </button>
 
+        <Link className="job" to="/create-job">
+          <span>
+            <i className="fa-solid fa-light fa-square-plus"></i>
+          </span>
+        </Link>
+
         <span className="premium">Try Premium for free</span>
       </NavLink>
     </>

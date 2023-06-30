@@ -113,7 +113,7 @@ function MainImg() {
             <strong onClick={toggleInputType}>show</strong>
           </div>
           <Link to="/forget-pass">
-            <p>Forgot password?</p>
+            <p style={{ color: "blue" }}>Forgot password?</p>
           </Link>
           {err && <p className="error">{err}</p>}
         </InputDiv>

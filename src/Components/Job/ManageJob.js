@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   DeleteJobButton,
   EditJobButton,
+  ErrorMessage,
   ManageJobListHeading,
   ManageJobListItemWrapper,
   ManageJobWrapper,
@@ -14,6 +15,7 @@ const ManageJobSection = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [jobData, setJobData] = useState([]);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const handleDeleteJob = async (jobId) => {
     try {
@@ -39,7 +41,6 @@ const ManageJobSection = () => {
     }
   };
 
-
   useEffect(() => {
     const fetchJobData = async () => {
       try {
@@ -56,6 +57,13 @@ const ManageJobSection = () => {
 
         const data = await response.json();
         setJobData(data); // Set the retrieved job data in the state
+
+        // Check if the user has posted any jobs
+        if (data.jobs.length > 0) {
+          setIsAuthorized(true);
+        } else {
+          setIsAuthorized(false);
+        }
       } catch (error) {
         console.error("Failed to fetch job data:", error);
       }
@@ -69,35 +77,59 @@ const ManageJobSection = () => {
     return <div>Loading...</div>;
   }
 
+  if (errorMessage) {
+    return (
+      <div className="error-container">
+        <h2>Unauthorized Access</h2>
+        <p>You are not authorized to manage any jobs.</p>
+      </div>
+    );
+  }
+
   return (
     <ManageJobWrapper>
-      {jobData.jobs.map((job) => (
-        <ManageJobListItemWrapper key={job._id}>
-          <div className="view-applicants">
-            <ManageJobListHeading>Title: {job.title}</ManageJobListHeading>
-            <Link to={`view/${job._id}`}>
-              <ViewApplicationBtn>
-                <i className="fa-solid fa-eye" />
-              </ViewApplicationBtn>
-            </Link>
-          </div>
-          <div>
-            <div>Description: {job.description}</div>
-            <div>Location: {job.jobLocation}</div>
-            <div>Posted: {job.username}</div>
-          </div>
-          <div>
-            <Link to={`edit-job/${job._id}`}>
-              <EditJobButton>Edit Job</EditJobButton>
-            </Link>
-            <DeleteJobButton onClick={() => handleDeleteJob(job._id)}>
-              <i className="fa-solid fa-trash" />
-            </DeleteJobButton>
-          </div>
-          {successMessage && <div>{successMessage}</div>}
-          {errorMessage && <div>{errorMessage}</div>}
-        </ManageJobListItemWrapper>
-      ))}
+      {jobData.jobs.length === 0 ? (
+        <div className="error-container">
+          <h2>No Jobs Posted</h2>
+        </div>
+      ) : (
+        jobData.jobs.map((job) => (
+          <ManageJobListItemWrapper key={job._id}>
+            <div className="view-applicants">
+              <ManageJobListHeading>Title: {job.title}</ManageJobListHeading>
+              <Link to={`view/${job._id}`}>
+                <ViewApplicationBtn>
+                  <i className="fa-solid fa-eye" />
+                </ViewApplicationBtn>
+              </Link>
+            </div>
+            <div>
+              <div>Description: {job.description}</div>
+              <div>Location: {job.jobLocation}</div>
+              <div>Posted: {job.username}</div>
+            </div>
+            <div>
+              {isAuthorized ? (
+                <>
+                  <Link to={`edit-job/${job._id}`}>
+                    <EditJobButton>Edit Job</EditJobButton>
+                  </Link>
+                  <DeleteJobButton onClick={() => handleDeleteJob(job._id)}>
+                    <i className="fa-solid fa-trash" />
+                  </DeleteJobButton>
+                </>
+              ) : (
+                <ErrorMessage className="error-container">
+                  <h2>Unauthorized Access</h2>
+                  <p>You are not authorized to manage this job.</p>
+                </ErrorMessage>
+              )}
+            </div>
+            {successMessage && <div>{successMessage}</div>}
+            {errorMessage && <div>{errorMessage}</div>}
+          </ManageJobListItemWrapper>
+        ))
+      )}
     </ManageJobWrapper>
   );
 };

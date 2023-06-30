@@ -67,10 +67,27 @@ export const JobListInfo = styled.div`
 `;
 
 export const ViewApplicationBtn = styled.button`
-cursor:pointer;
-color:#0a66c2;
-font-size:18px;
-
-
+  cursor: pointer;
+  color: #0a66c2;
+  font-size: 18px;
 `;
 
+export const ErrorMessage = styled.div`
+  .error-container {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .error-container h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .error-container p {
+    font-size: 16px;
+    margin-bottom: 0;
+  }
+`;

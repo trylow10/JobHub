@@ -53,9 +53,10 @@ router.get("/allJobs", validateToken, async (req, res) => {
     const appliedJobs = await Application.find({ applicant: userId }).distinct(
       "job"
     );
-    const jobs = await Job.find({ _id: { $nin: appliedJobs } }).populate(
-      "jobPoster"
-    );
+    const jobs = await Job.find({
+      _id: { $nin: appliedJobs },
+      jobPoster: { $ne: userId }, // Exclude jobs created by the user
+    }).populate("jobPoster");
 
     if (jobs.length === 0) {
       response.message = "No jobs found";
@@ -132,6 +133,7 @@ router.get("/recommendedJobs", validateToken, async (req, res) => {
     const jobs = await Job.find({
       skills: { $all: userSkills },
       _id: { $nin: appliedJobs },
+      jobPoster: { $ne: userId }, // Exclude jobs created by the user
     });
 
     response.success = true;
@@ -164,7 +166,14 @@ router.get("/followersJobs", validateToken, async (req, res) => {
     }
 
     const networkIds = user.networks;
-    const jobs = await Job.find({ jobPoster: { $in: networkIds } });
+    const jobs = await Job.find({
+      jobPoster: {
+        $nin: [userId], // Exclude jobs created by the user
+        $in: networkIds, // Find jobs posted by users in the network
+      },
+    })
+      .populate("jobPoster", "uname") // Populate jobPoster field and select uname
+      .exec();
 
     response.success = true;
     response.message = "Jobs posted by user's network";
