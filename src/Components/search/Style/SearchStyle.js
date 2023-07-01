@@ -4,17 +4,14 @@ export const Overlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
 `;
 
 export const SearchWrapper = styled.div`
   position: relative;
+  z-index: 69;
 `;
 
 export const Input = styled.input`
@@ -71,4 +68,63 @@ export const SuggestionItem = styled.li`
   &:hover {
     background-color: #ebebeb;
   }
+`;
+
+export const Wrapper = styled.div`
+  padding: 20px;
+  margin: 0 164px;
+`;
+
+export const Title = styled.h2`
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-align: start;
+  margin-bottom: 24px;
+`;
+
+export const Section = styled.div`
+  margin-bottom: 24px;
+`;
+
+export const SectionTitle = styled.h3`
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-align: start;
+`;
+
+export const List = styled.ul`
+  list-style: none;
+  padding: 0;
+  dislay: flex;
+  align-items: center;
+  justify-content: start;
+`;
+
+export const ListItem = styled.li`
+  display: flex;
+  width: fit-content;
+  align-items: start;
+  margin-bottom: 16px;
+  border: 1px solid gray;
+  border-radius: 20px;
+  padding: 8px;
+`;
+
+export const ProfileImage = styled.img`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-right: 16px;
+`;
+
+export const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const JobInfo = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

@@ -218,6 +218,8 @@ export const SearchBox = styled.div`
 
 // Nav-menu btn container
 export const NavLink = styled.div`
+  display: flex;
+  align-items: center;
   /* btn container */
   .icon-div {
     color: gray;
@@ -238,7 +240,8 @@ export const NavLink = styled.div`
     z-index: 1;
     display: none;
 
-    li, a {
+    li,
+    a {
       width: 100px;
       padding: 0.3rem 0;
       font-size: 1rem;
@@ -254,15 +257,15 @@ export const NavLink = styled.div`
     .profile {
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
-      
-      &:hover{
+
+      &:hover {
         color: white;
         background-color: #2c8c00;
       }
     }
 
     .posts {
-      &:hover{
+      &:hover {
         color: white;
         background-color: var(--primary-color);
       }
@@ -273,7 +276,7 @@ export const NavLink = styled.div`
       border-bottom-left-radius: 8px;
       border-bottom-right-radius: 8px;
 
-      &:hover{
+      &:hover {
         color: white;
         background-color: #ce3434;
       }

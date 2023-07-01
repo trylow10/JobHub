@@ -174,8 +174,8 @@ Router.get("/recommended", validateToken, async (req, res) => {
     })
       .sort({ _id: -1 }) // Sort by descending order of post ID
       .limit(5) // Retrieve a maximum of 5 recommended posts
-      .populate("userId", "profilePicture") // Populate the userId field with the profilePicture property
-      .select("userId text hashtags") // Select the userId, text, and hashtags fields
+      .populate("_id", "profilePicture") // Populate the userId field with the profilePicture property
+      .select("_id text hashtags") // Select the userId, text, and hashtags fields
       .lean(); // Convert documents to plain JavaScript objects
 
     const recommendedProfiles = recommendedPosts.map((post) => ({
@@ -183,6 +183,7 @@ Router.get("/recommended", validateToken, async (req, res) => {
       postText: post.text,
       hashtags: post.hashtags,
     }));
+    ``;
 
     response["success"] = true;
     response["userId"] = userId;

@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   SearchWrapper,
   SuggestionList,
   SuggestionItem,
+  Overlay,
 } from "./Style/SearchStyle";
 import { SearchBox } from "../Feed/Styles/HeaderStyled";
-import { API, HEADLINE, PROFILE_IMG } from "../../env";
+import { API } from "../../env";
 
 const SearchForm = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [blackOverlay, setBlackOverlay] = useState(false);
+  const [_, setSearchResults] = useState([]);
+  const suggestionRef = useRef(null); // Reference to the suggestion div
+  const overlayRef = useRef(null); // Reference to the overlay div
 
   useEffect(() => {
     if (query.trim() !== "") {
@@ -20,6 +26,14 @@ const SearchForm = () => {
       setSearchResults([]);
     }
   }, [query]);
+
+  useEffect(() => {
+    // Add event listener to handle clicks outside of the suggestion div
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
 
   const fetchSuggestions = async (query) => {
     try {
@@ -38,12 +52,13 @@ const SearchForm = () => {
       setSuggestions([]);
       setSearchResults([]);
     }
+    setBlackOverlay(newQuery.trim() !== ""); // Show the overlay when the query has a value
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setQuery(suggestion.text);
-    setSuggestions([]);
-    handleSearch(suggestion.text); // Call handleSearch with clicked suggestion's text
+  const handleSuggestionClick = () => {
+    handleSearch(query); // Call handleSearch without passing suggestion's text
+    setSuggestions([]); // Hide the suggestion list
+    overlayRef.current.style.display = "none"; // Hide the overlay
   };
 
   const handleSearch = async (searchQuery) => {
@@ -53,7 +68,7 @@ const SearchForm = () => {
         const data = await response.json();
 
         setSearchResults(data.hits);
-        setSuggestions([]); // Clear suggestions when search results are displayed
+        navigate(`/search?q=${searchQuery}`);
       } catch (error) {
         console.error(
           "An error occurred while fetching search results:",
@@ -69,85 +84,51 @@ const SearchForm = () => {
     }
   };
 
+  const handleOutsideClick = (e) => {
+    if (
+      suggestionRef.current &&
+      !suggestionRef.current.contains(e.target) &&
+      !overlayRef.current.contains(e.target)
+    ) {
+      setSuggestions([]); // Hide suggestions when clicked outside the suggestion div
+    }
+  };
+
   return (
-    <div>
-      <SearchWrapper>
-        <SearchBox>
-          <i
-            className="fa-solid fa-magnifying-glass"
-            onClick={() => handleSearch(query)}
-          />
-          <input
-            placeholder="Search"
-            type="text"
-            value={query}
-            onChange={handleQueryChange}
-            onKeyPress={handleKeyPress}
-          />
-        </SearchBox>
+    <>
+      {blackOverlay && <Overlay ref={overlayRef} />}
 
-        {suggestions.length > 0 && (
-          <SuggestionList>
-            {suggestions.map((suggestion) => (
-              <SuggestionItem
-                key={suggestion.text}
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                {suggestion.text}
-              </SuggestionItem>
-            ))}
-          </SuggestionList>
-        )}
+      <div>
+        <SearchWrapper>
+          <SearchBox>
+            <i
+              className="fa-solid fa-magnifying-glass"
+              onClick={() => handleSearch(query)}
+            />
+            <input
+              placeholder="Search"
+              type="text"
+              value={query}
+              onChange={handleQueryChange}
+              onKeyPress={handleKeyPress}
+            />
+          </SearchBox>
 
-        {searchResults.length > 0 && (
-          <div>
-            <h2>Search Results</h2>
-            <div>
-              <h3>Users</h3>
-              <ul>
-                {searchResults
-                  .filter((result) => result.type === "user")
-                  .map((result, index) => (
-                    <li key={index}>
-                      <div>
-                        <img
-                          src={result.profileImg || PROFILE_IMG}
-                          alt="User Profile"
-                          style={{ width: "100px", height: "100px" }}
-                        />
-                        <p>Username: {result.uname}</p>
-                        <p>Headline: {result.headline || HEADLINE}</p>
-                        <p>Email: {result.email}</p>
-                        <p>Skills: {result.skills}</p>
-                      </div>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-            <div>
-              <h3>Jobs</h3>
-              <ul>
-                {searchResults
-                  .filter((result) => result.type === "job")
-                  .map((result, index) => (
-                    <li key={index}>
-                      <div>
-                        <p>Title: {result.title}</p>
-                        <p>Description: {result.description}</p>
-                        <p>Company: {result.company}</p>
-                        <p>Workplace: {result.workPlace}</p>
-                        <p>Job Location: {result.jobLocation}</p>
-                        <p>Job Type: {result.jobType}</p>
-                        <p>Skills: {result.skills}</p>
-                      </div>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          </div>
-        )}
-      </SearchWrapper>
-    </div>
+          {suggestions.length > 0 && (
+            <SuggestionList ref={suggestionRef}>
+              {suggestions.map((suggestion) => (
+                <SuggestionItem
+                  key={suggestion.text}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  {suggestion.text}
+                </SuggestionItem>
+              ))}
+            </SuggestionList>
+          )}
+        </SearchWrapper>
+      </div>
+    </>
   );
 };
 
