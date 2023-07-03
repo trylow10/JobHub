@@ -49,6 +49,15 @@ const userSchema = mongoose.Schema({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     default: [],
   },
+  recommendedUsers: {
+    type: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        hashtags: [String],
+      },
+    ],
+    default: [],
+  },
   networkReqs: {
     type: [String],
     default: [],
@@ -59,30 +68,38 @@ const userSchema = mongoose.Schema({
   },
   roles: {
     type: [String],
-    default: ['jobSeeker']
+    default: ["jobSeeker"],
   },
   skills: {
     type: [String],
     default: [],
-    required:true,
+    required: true,
   },
   experience: {
     type: Number,
     default: 0,
   },
   company: {
-    type: String
+    type: String,
   },
   workPlace: {
     type: String,
-    enum: ['Onsite', 'Remote', 'Hybrid']
+    enum: ["Onsite", "Remote", "Hybrid"],
   },
   jobLocation: {
-    type: String
+    type: String,
   },
   jobType: {
     type: String,
-    enum: ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship', 'Temporary', 'Volunteer']
+    enum: [
+      "Full-time",
+      "Part-time",
+      "Contract",
+      "Freelance",
+      "Internship",
+      "Temporary",
+      "Volunteer",
+    ],
   },
 });
 

@@ -108,102 +108,57 @@ Router.get("/one", validateToken, async (req, res) => {
   return res.json({ ...responce, signature: signature(responce) });
 });
 
-// Router.get("/recommended", validateToken, async (req, res) => {
-//   const userId = req.query.userId || req.body.activeSessionId;
-//   const response = {};
-
-//   try {
-//     // Find the user
-//     const user = await User.findOne({ _id: userId });
-//     if (!user) {
-//       response["success"] = false;
-//       response["error"] = { msg: "User not found", code: 10 };
-//       return res.json({ ...response, signature: signature(response) });
-//     }
-
-//     // Get the user's following users
-//     const followingUsers = user.following || [];
-
-//     // Find recommended posts that match the user's related posts' hashtags
-//     const recommendedPosts = await Post.find({
-//       $or: [
-//         { _id: { $in: user.recommendedPosts } }, // Posts recommended based on user's activity
-//         { _id: { $in: followingUsers } }, // Posts from users the user is following
-//         { hashtags: { $in: user.hashtags } }, // Posts with matching hashtags
-//       ],
-//       _id: { $ne: userId }, // Exclude the user's own posts
-//     })
-//       .sort({ _id: -1 }) // Sort by descending order of post ID
-//       .limit(5) // Retrieve a maximum of 5 recommended posts
-//       .lean(); // Convert documents to plain JavaScript objects
-
-//     response["success"] = true;
-//     response["userId"] = userId;
-//     response["recommendedPosts"] = recommendedPosts;
-//     return res.json({ ...response, signature: signature(response) });
-//   } catch (error) {
-//     console.error("Error fetching recommended posts:", error);
-//     res.status(500).json({ success: false, error: { msg: "Internal server error" } });
-//   }
-// });
-
-Router.get("/recommended", validateToken, async (req, res) => {
-  const userId = req.query.userId || req.body.activeSessionId;
+Router.get("/recommend", validateToken, async (req, res) => {
+  const userId = req.body.activeSessionId;
   const response = {};
 
   try {
-    // Find the user
     const user = await User.findOne({ _id: userId });
+
     if (!user) {
       response["success"] = false;
-      response["error"] = { msg: "User not found", code: 10 };
+      response["error"] = { msg: "User not found", code: 404 };
       return res.json({ ...response, signature: signature(response) });
     }
 
-    // Get the user's following users
-    const followingUsers = user.following || [];
+    const userHashtags = user.hashtags || [];
 
-    // Find recommended posts that match the user's related posts' hashtags
-    const recommendedPosts = await Post.find({
-      $or: [
-        { _id: { $in: user.recommendedPosts } }, // Posts recommended based on user's activity
-        { _id: { $in: followingUsers } }, // Posts from users the user is following
-        { hashtags: { $in: user.hashtags } }, // Posts with matching hashtags
-      ],
-      _id: { $ne: userId }, // Exclude the user's own posts
-    })
-      .sort({ _id: -1 }) // Sort by descending order of post ID
-      .limit(5) // Retrieve a maximum of 5 recommended posts
-      .populate("_id", "profilePicture") // Populate the userId field with the profilePicture property
-      .select("_id text hashtags") // Select the userId, text, and hashtags fields
-      .lean(); // Convert documents to plain JavaScript objects
+    const usersWithSimilarHashtags = await User.find({
+      _id: { $ne: userId },
+      hashtags: { $in: userHashtags },
+    }).select("uname email profileImg headlines hashtags");
 
-    const recommendedProfiles = recommendedPosts.map((post) => ({
-      profilePicture: post.userId.profilePicture,
-      postText: post.text,
-      hashtags: post.hashtags,
+    const recommendedUsers = usersWithSimilarHashtags.map((user) => ({
+      userId: user._id,
+      username: user.uname,
+      email: user.email,
+      profilePicture: user.profileImg,
+      headlines: user.headlines,
+      hashtags: user.hashtags,
     }));
-    ``;
+
+    const recommendation = {
+      hashtags: userHashtags,
+      recommendUsers: recommendedUsers,
+    };
 
     response["success"] = true;
-    response["userId"] = userId;
-    response["recommendedProfiles"] = recommendedProfiles;
-    return res.json({ ...response, signature: signature(response) });
+    response["recommendation"] = recommendation;
+    res.json({ ...response, signature: signature(response) });
   } catch (error) {
-    console.error("Error fetching recommended posts:", error);
+    console.error("Error retrieving recommendation:", error);
     res
       .status(500)
       .json({ success: false, error: { msg: "Internal server error" } });
   }
 });
 
-// Create a new post
-
 Router.post("/", validateToken, async (req, res) => {
   const userId = req.body.activeSessionId;
   const postTxt = req.body.text || "";
   const postImgs = req.body.postImgs || [];
   const response = {};
+
   if (!postTxt && postImgs.length === 0) {
     response["success"] = false;
     response["error"] = { msg: "Either give text or imgs", code: 14 };
@@ -283,8 +238,8 @@ Router.post("/", validateToken, async (req, res) => {
     await Post.findOneAndUpdate(
       { _id: userId },
       {
-        posts: [newPost, ...userPosts.posts],
-        comments: [{ _id: newPost._id, comments: [] }, ...userPosts.comments],
+        $push: { posts: newPost },
+        $push: { comments: { _id: newPost._id, comments: [] } },
       }
     );
 
@@ -299,7 +254,7 @@ Router.post("/", validateToken, async (req, res) => {
       const feed = (await Post.findOne({ _id: follower })).feed;
       await Post.findOneAndUpdate(
         { _id: follower },
-        { feed: [{ _id: userId, post: newPost._id }, ...feed] }
+        { $push: { feed: { _id: userId, post: newPost._id } } }
       );
     }
 
@@ -312,7 +267,7 @@ Router.post("/", validateToken, async (req, res) => {
       .limit(5)
       .lean();
 
-    // Update recommendedPosts in the User collection
+    // Update recommendedPosts and hashtags in the User collection
     await User.findOneAndUpdate(
       { _id: userId },
       {
@@ -321,6 +276,25 @@ Router.post("/", validateToken, async (req, res) => {
         },
       }
     );
+
+    // Find users who posted similar hashtags
+    const usersWithSimilarHashtags = await User.aggregate([
+      { $match: { hashtags: { $in: hashtags } } },
+      {
+        $group: {
+          _id: null,
+          users: { $addToSet: { _id: "$_id", hashtags: "$hashtags" } },
+        },
+      },
+    ]);
+
+    if (usersWithSimilarHashtags.length > 0) {
+      const recommendedUsers = usersWithSimilarHashtags[0].users;
+      await User.findOneAndUpdate(
+        { _id: userId },
+        { $set: { recommendedUsers } }
+      );
+    }
   } catch (error) {
     console.error("Error creating post:", error);
     res

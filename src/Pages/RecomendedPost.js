@@ -1,12 +1,12 @@
 import React from "react";
 import Header from "../Components/Feed/Header";
-import RecomendPostComponent from "../Components/Feed/RecommendedStyleComponent";
+import RecomendComponent from "../Components/Feed/RecommendComponent";
 
 const RecommendedPost = () => {
   return (
     <div>
       <Header />
-      <RecomendPostComponent />
+      <RecomendComponent />
     </div>
   );
 };
