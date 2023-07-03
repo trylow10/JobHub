@@ -7,6 +7,7 @@ import { Container, Section, Profile } from "./Styles/UserInfoStyled";
 import { Connection, Premium, InfoConatiner } from "./Styles/UserInfoStyled";
 
 import { BACKGROUND_IMG, HEADLINE, PROFILE_IMG } from "../../env";
+import { Link } from "react-router-dom";
 
 const MainContainer = ({ userInfo, showDisoverMore }) => {
   return (
@@ -62,7 +63,11 @@ const MainContainer = ({ userInfo, showDisoverMore }) => {
           <p>events</p>
           <i className="fa-solid fa-plus" />
         </span>
-        <span className="hashtags">followed hashtags</span>
+        <span className="hashtags">
+          <Link to={"/recommend"} style={{ color: "#0a66c2" }}>
+            followed hashtags
+          </Link>
+        </span>
         <hr />
 
         <Section className="more">

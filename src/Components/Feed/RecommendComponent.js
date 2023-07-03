@@ -7,6 +7,7 @@ import {
   PostTitle,
   PostContent,
   UserProfilePicture,
+  RecommendWrapper,
 } from "./Styles/RecomendedStyles";
 const RecomendComponent = () => {
   const [recommendedHashtags, setRecommendedHashtags] = useState([]);
@@ -55,34 +56,36 @@ const RecomendComponent = () => {
   return (
     <FeedContainer>
       <h2>Based on Your Hashtags: {recommendedHashtags.join(", ")}</h2>
-      {recommendedUsers.length > 0 ? (
-        recommendedUsers.map((user, index) => (
-          <PostContainer key={index}>
-            <UserProfilePicture>
-              <img src={user.profilePicture || PROFILE_IMG} alt="profile" />
-            </UserProfilePicture>
-            <div>
-              <PostTitle>{user.username}</PostTitle>
-              <PostContent>
-                <p>
-                  Hashtags:{" "}
-                  {user.hashtags.length > 0
-                    ? user.hashtags.join(", ")
-                    : "No hashtags"}
-                </p>
-              </PostContent>
-            </div>
-            <div>
-              <PostContent>
-                <p>Email: {user.email}</p>
-                <p>Headlines: {user.headlines || HEADLINE}</p>
-              </PostContent>
-            </div>
-          </PostContainer>
-        ))
-      ) : (
-        <p>No recommended users available.</p>
-      )}
+      <RecommendWrapper>
+        {recommendedUsers.length > 0 ? (
+          recommendedUsers.map((user, index) => (
+            <PostContainer key={index}>
+              <UserProfilePicture>
+                <img src={user.profilePicture || PROFILE_IMG} alt="profile" />
+              </UserProfilePicture>
+              <div>
+                <PostTitle>{user.username}</PostTitle>
+                <PostContent>
+                  <p>
+                    Hashtags:{" "}
+                    {user.hashtags.length > 0
+                      ? user.hashtags.join(", ")
+                      : "No hashtags"}
+                  </p>
+                </PostContent>
+              </div>
+              <div>
+                <PostContent>
+                  <p style={{ marginBottom: "8px" }}>Email: {user.email}</p>
+                  <p>Headlines: {user.headlines || HEADLINE}</p>
+                </PostContent>
+              </div>
+            </PostContainer>
+          ))
+        ) : (
+          <p>No recommended users available.</p>
+        )}
+      </RecommendWrapper>
     </FeedContainer>
   );
 };

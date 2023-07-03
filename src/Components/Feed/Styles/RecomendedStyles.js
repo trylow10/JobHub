@@ -1,29 +1,33 @@
 import styled from "styled-components";
 
 export const FeedContainer = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
   padding: 20px;
   display: flex;
   flex-direction: column;
+  margin: 0 124px;
+`;
+export const RecommendWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 12px;
+  margin-top: 24px;
 `;
 
 export const PostContainer = styled.div`
   background-color: #f5f5f5;
   border-radius: 5px;
   padding: 20px;
-  margin-bottom: 20px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
   align-items: center;
+  width: 300px;
+  min-height: 300px;
 `;
 
 export const PostTitle = styled.h3`
   font-size: 18px;
-  color: #333;
+  color: black;
   margin-bottom: 10px;
+  text-align: center;
 `;
 
 export const PostContent = styled.p`
