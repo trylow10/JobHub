@@ -58,11 +58,6 @@ router.get("/allJobs", validateToken, async (req, res) => {
       jobPoster: { $ne: userId }, // Exclude jobs created by the user
     }).populate("jobPoster");
 
-    if (jobs.length === 0) {
-      response.message = "No jobs found";
-      return res.status(404).customJson({ ...response });
-    }
-
     response.success = true;
     response.message = "All Jobs";
     response.jobs = jobs;
@@ -133,8 +128,10 @@ router.get("/recommendedJobs", validateToken, async (req, res) => {
     const jobs = await Job.find({
       skills: { $all: userSkills },
       _id: { $nin: appliedJobs },
-      jobPoster: { $ne: userId }, // Exclude jobs created by the user
-    });
+      jobPoster: { $ne: userId },
+    })
+      .populate("jobPoster", "uname")
+      .exec();
 
     response.success = true;
     response.message = "Recommended jobs for the user";
@@ -168,11 +165,11 @@ router.get("/followersJobs", validateToken, async (req, res) => {
     const networkIds = user.networks;
     const jobs = await Job.find({
       jobPoster: {
-        $nin: [userId], // Exclude jobs created by the user
-        $in: networkIds, // Find jobs posted by users in the network
+        $nin: [userId],
+        $in: networkIds,
       },
     })
-      .populate("jobPoster", "uname") // Populate jobPoster field and select uname
+      .populate("jobPoster", "uname")
       .exec();
 
     response.success = true;

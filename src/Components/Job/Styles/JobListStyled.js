@@ -5,7 +5,7 @@ export const JobListWrapper = styled.div`
   flex-wrap: wrap;
   gap: 12px;
   padding: 0 2rem;
-  margin: 2rem  6rem 2rem 28rem;
+  margin: 2rem 6rem 2rem 28rem;
 `;
 
 export const JobListItemWrapper = styled.div`
@@ -21,7 +21,7 @@ export const JobListItemWrapper = styled.div`
 `;
 
 export const JobListHeading = styled.div`
-  margin-left:50%;
+  margin-left: 50%;
   font-size: 24px;
   font-weight: 600;
 `;
@@ -39,4 +39,17 @@ export const JobListInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 18px;
+`;
+export const ErrorMessage = styled.div`
+  color: red;
+  margin: 17rem;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+`;
+export const DisplayMessage = styled.div`
+  font-size: 18px;
+  color: #555;
+  background-color: #f8f8f8;
+  margin: 2rem 0 2rem 18rem;
 `;

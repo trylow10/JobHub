@@ -6,10 +6,13 @@ import {
   JobListHeading,
   ApplyJobButton,
   JobListInfo,
+  ErrorMessage,
+  DisplayMessage,
 } from "./Styles/JobListStyled";
 import { Link } from "react-router-dom";
 import { Container, Section } from "./Styles/JobSidebarStyled";
 import UserInfo from "../Feed/UserInfo";
+import Loader from "../extra/Loader";
 
 const JobList = () => {
   const [recommendedJobs, setRecommendedJobs] = useState([]);
@@ -43,7 +46,7 @@ const JobList = () => {
           `${API}/api/job/allJobs?token=${localStorage.getItem("token")}`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch all jobs");
+          throw new Error("No response from api");
         }
         const data = await response.json();
         setAllJobs(data.jobs);
@@ -77,15 +80,15 @@ const JobList = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <ErrorMessage>Error: {error}</ErrorMessage>;
   }
 
   return (
-    <div>
+    <>
       <UserInfo showDisoverMore={false} />
       <Container>
         <Section className="discover">
@@ -104,6 +107,27 @@ const JobList = () => {
         </Section>
       </Container>
       <div>
+        <JobListHeading>Explore Jobs</JobListHeading>
+        <JobListWrapper>
+          {allJobs.length > 0 ? (
+            allJobs.map((job) => (
+              <JobListItemWrapper key={job._id}>
+                <JobListInfo>
+                  <h3>{job.title}</h3>
+                  <p>Description: {job.description}</p>
+                  <p>Posted by: {job.jobPoster.uname}</p>
+                </JobListInfo>
+                <Link to={`/job/${job._id}`} style={{ alignSelf: "center" }}>
+                  <ApplyJobButton>See More</ApplyJobButton>
+                </Link>
+              </JobListItemWrapper>
+            ))
+          ) : (
+            <DisplayMessage>No jobs found.</DisplayMessage>
+          )}
+        </JobListWrapper>
+      </div>
+      <div>
         <JobListHeading>Recommended Jobs for You</JobListHeading>
         <JobListWrapper>
           {recommendedJobs.length > 0 ? (
@@ -120,28 +144,7 @@ const JobList = () => {
               </JobListItemWrapper>
             ))
           ) : (
-            <div>No recommended jobs found.</div>
-          )}
-        </JobListWrapper>
-      </div>
-      <div>
-        <JobListHeading>All Jobs</JobListHeading>
-        <JobListWrapper>
-          {allJobs.length > 0 ? (
-            allJobs.map((job) => (
-              <JobListItemWrapper key={job._id}>
-                <JobListInfo>
-                  <h3>{job.title}</h3>
-                  <p>Description: {job.description}</p>
-                  <p>Posted by: {job.jobPoster.uname}</p>
-                </JobListInfo>
-                <Link to={`/job/${job._id}`} style={{ alignSelf: "center" }}>
-                  <ApplyJobButton>See More</ApplyJobButton>
-                </Link>
-              </JobListItemWrapper>
-            ))
-          ) : (
-            <div>No jobs found.</div>
+            <DisplayMessage>No recommended jobs found.</DisplayMessage>
           )}
         </JobListWrapper>
       </div>
@@ -162,11 +165,11 @@ const JobList = () => {
               </JobListItemWrapper>
             ))
           ) : (
-            <div>No jobs from your connection.</div>
+            <DisplayMessage>No jobs from your connection.</DisplayMessage>
           )}
         </JobListWrapper>
       </div>
-    </div>
+    </>
   );
 };
 
