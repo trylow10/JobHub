@@ -5,10 +5,9 @@ export const Container = styled.div`
   background-color: transparent;
   min-width: 210px;
   max-width: 230px;
-  position:fixed;
-  left:160px;
-  top:65%;
-
+  position: fixed;
+  left: 160px;
+  top: 70%;
 
   /* Discover more - Container */
   .discover {

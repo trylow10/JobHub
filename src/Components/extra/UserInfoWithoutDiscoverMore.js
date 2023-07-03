@@ -3,12 +3,16 @@ import { React } from "react";
 import { useSelector } from "react-redux"; // redux
 
 // Styled Components
-import { Container, Section, Profile } from "./Styles/UserInfoStyled";
-import { Connection, Premium, InfoConatiner } from "./Styles/UserInfoStyled";
+import { Container, Section, Profile } from "../Feed/Styles/UserInfoStyled";
+import {
+  Connection,
+  Premium,
+  InfoConatiner,
+} from "../Feed/Styles/UserInfoStyled";
 
 import { BACKGROUND_IMG, HEADLINE, PROFILE_IMG } from "../../env";
 
-const MainContainer = ({ userInfo, showDisoverMore }) => {
+const MainContainer = ({ userInfo }) => {
   return (
     <Container>
       {/* User Profile */}
@@ -55,19 +59,6 @@ const MainContainer = ({ userInfo, showDisoverMore }) => {
             <span>My items</span>
           </Section>
         </InfoConatiner>
-      </Section>
-      <Section className="discover">
-        <span className="groups">groups</span>
-        <span className="events">
-          <p>events</p>
-          <i className="fa-solid fa-plus" />
-        </span>
-        <span className="hashtags">followed hashtags</span>
-        <hr />
-
-        <Section className="more">
-          <span>Discover more</span>
-        </Section>
       </Section>
     </Container>
   );

@@ -11,7 +11,7 @@ import {
 } from "./Styles/JobListStyled";
 import { Link } from "react-router-dom";
 import { Container, Section } from "./Styles/JobSidebarStyled";
-import UserInfo from "../Feed/UserInfo";
+import UserInfo from "../extra/UserInfoWithoutDiscoverMore";
 import Loader from "../extra/Loader";
 
 const JobList = () => {
@@ -89,7 +89,7 @@ const JobList = () => {
 
   return (
     <>
-      <UserInfo showDisoverMore={false} />
+      <UserInfo />
       <Container>
         <Section className="discover">
           <span className="events">
