@@ -155,7 +155,7 @@ Router.get("/recommend", validateToken, async (req, res) => {
 
 Router.post("/", validateToken, async (req, res) => {
   const userId = req.body.activeSessionId;
-  const postTxt = req.body.text || "";
+  const postTxt = req.body.text || [];
   const postImgs = req.body.postImgs || [];
   const response = {};
 
@@ -225,8 +225,6 @@ Router.post("/", validateToken, async (req, res) => {
       }
       return acc;
     }, []);
-
-    // Update hashtags in the User collection
     await User.findOneAndUpdate(
       { _id: userId },
       { $addToSet: { hashtags: { $each: hashtags } } }
@@ -234,12 +232,11 @@ Router.post("/", validateToken, async (req, res) => {
 
     newPost.hashtags = hashtags;
 
-    // Save the new post in the Post collection
     await Post.findOneAndUpdate(
       { _id: userId },
       {
-        $push: { posts: newPost },
-        $push: { comments: { _id: newPost._id, comments: [] } },
+        posts: [newPost, ...userPosts.posts],
+        comments: [{ _id: newPost._id, comments: [] }, ...userPosts.comments],
       }
     );
 
@@ -249,35 +246,13 @@ Router.post("/", validateToken, async (req, res) => {
 
     const user = await User.findOne({ _id: userId });
     const followers = user.followers;
-
     for (let follower of followers) {
       const feed = (await Post.findOne({ _id: follower })).feed;
       await Post.findOneAndUpdate(
         { _id: follower },
-        { $push: { feed: { _id: userId, post: newPost._id } } }
+        { feed: [{ _id: userId, post: newPost._id }, ...feed] }
       );
     }
-
-    // Find related posts with similar hashtags
-    const relatedPosts = await Post.find({
-      _id: { $ne: userId },
-      hashtags: { $in: hashtags },
-    })
-      .sort({ _id: -1 })
-      .limit(5)
-      .lean();
-
-    // Update recommendedPosts and hashtags in the User collection
-    await User.findOneAndUpdate(
-      { _id: userId },
-      {
-        $addToSet: {
-          recommendedPosts: { $each: relatedPosts.map((post) => post._id) },
-        },
-      }
-    );
-
-    // Find users who posted similar hashtags
     const usersWithSimilarHashtags = await User.aggregate([
       { $match: { hashtags: { $in: hashtags } } },
       {

@@ -9,8 +9,8 @@ const LoaderContainer = styled.div`
 `;
 
 const LoaderImage = styled.img`
-  width: 100px; /* Adjust the width to your desired size */
-  height: 100px; /* Adjust the height to your desired size */
+  width: 50px; /* Adjust the width to your desired size */
+  height: 50px; /* Adjust the height to your desired size */
 `;
 
 const Loader = () => {

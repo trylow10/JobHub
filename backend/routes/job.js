@@ -116,7 +116,7 @@ router.get("/my-jobs", validateToken, async (req, res) => {
 
 //get recommended jobs
 router.get("/recommendedJobs", validateToken, async (req, res) => {
-  const userId = req.body.activeSessionId || req.user.id; // Assuming the user ID is available in req.user.id after token validation
+  const userId = req.body.activeSessionId;
   let response = {};
 
   try {

@@ -11,11 +11,14 @@ import {
 import { API } from "../../env";
 import { Link } from "react-router-dom";
 
+import Loader from "../extra/Loader"; // Replace "Loader" with your own Loader component
+
 const ManageJobSection = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [jobData, setJobData] = useState([]);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleDeleteJob = async (jobId) => {
     try {
@@ -66,23 +69,23 @@ const ManageJobSection = () => {
         }
       } catch (error) {
         console.error("Failed to fetch job data:", error);
+      } finally {
+        setIsLoading(false); // Set loading state to false after fetching data
       }
     };
 
     fetchJobData();
   }, []);
 
-  // Wait for jobData to be fetched before rendering the component
-  if (jobData.length === 0) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return <Loader />;
   }
 
   if (errorMessage) {
     return (
-      <div className="error-container">
+      <ErrorMessage>
         <h2>Unauthorized Access</h2>
-        <p>You are not authorized to manage any jobs.</p>
-      </div>
+      </ErrorMessage>
     );
   }
 

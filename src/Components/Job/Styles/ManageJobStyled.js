@@ -18,9 +18,9 @@ export const ManageJobListItemWrapper = styled.div`
   gap: 18px;
   border: 1px solid gray;
   border-radius: 20px;
-  .view-applicants{
-    display:flex;
-    justify-content:space-between;
+  .view-applicants {
+    display: flex;
+    justify-content: space-between;
   }
 `;
 
@@ -43,8 +43,8 @@ export const EditJobButton = styled.button`
 export const DeleteJobButton = styled.button`
   color: red;
   font-weight: 600;
-  font-size:18px;
-  margin-left:108px;
+  font-size: 18px;
+  margin-left: 108px;
   padding: 12px 16px;
   border-radius: 20px;
   cursor: pointer;
@@ -72,6 +72,7 @@ export const ViewApplicationBtn = styled.button`
   font-size: 18px;
 `;
 
+//TODO:/error message
 export const ErrorMessage = styled.div`
   .error-container {
     background-color: #f8d7da;
@@ -79,11 +80,18 @@ export const ErrorMessage = styled.div`
     padding: 20px;
     border-radius: 4px;
     margin-bottom: 20px;
+    text-align: center; /* Center align the content */
+    margin-top: 20px; /* Add top margin */
   }
 
   .error-container h2 {
     font-size: 20px;
     margin-bottom: 10px;
+    background-color: #f8d7da;
+    color: red; /* Set the color to red */
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 20px;
   }
 
   .error-container p {

@@ -8,8 +8,6 @@ import {
   PostContent,
   UserProfilePicture,
 } from "./Styles/RecomendedStyles";
-("../../env");
-
 const RecomendComponent = () => {
   const [recommendedHashtags, setRecommendedHashtags] = useState([]);
   const [recommendedUsers, setRecommendedUsers] = useState([]);
@@ -56,15 +54,13 @@ const RecomendComponent = () => {
 
   return (
     <FeedContainer>
-      <h2>Recommended Hashtags: {recommendedHashtags.join(", ")}</h2>
-      <h2>Recommended Users</h2>
+      <h2>Based on Your Hashtags: {recommendedHashtags.join(", ")}</h2>
       {recommendedUsers.length > 0 ? (
         recommendedUsers.map((user, index) => (
           <PostContainer key={index}>
-            <UserProfilePicture
-              src={user.profilePicture || PROFILE_IMG}
-              alt="Profile Picture"
-            />
+            <UserProfilePicture>
+              <img src={user.profilePicture || PROFILE_IMG} alt="profile" />
+            </UserProfilePicture>
             <div>
               <PostTitle>{user.username}</PostTitle>
               <PostContent>
