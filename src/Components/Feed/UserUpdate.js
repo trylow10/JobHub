@@ -46,6 +46,13 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
 
     return res.link;
   };
+  // const userInfoForSkill = async () => {
+  //   const user = await fetch(
+  //     `${API}/api/user/info?token=${localStorage.getItem("token")}`
+  //   );
+  //   const userResponse = user?.json();
+  console.log(userInfo, "to get skill");
+  // };
 
   const saveInfo = async () => {
     if (!exit) return;
@@ -55,7 +62,13 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
     const bgImg = document.querySelector("#userinfo-update input#bgImg");
 
     const userInfoUpdater = document.getElementById("userinfo-update");
-    if (!userName && !headline && !profileImg.value && !bgImg.value && skills.length === 0) {
+    if (
+      !userName &&
+      !headline &&
+      !profileImg.value &&
+      !bgImg.value &&
+      skills.length === 0
+    ) {
       userInfoUpdater.classList.remove("visible");
       return;
     }
@@ -127,7 +140,6 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
     setSkills(updatedSkills);
   };
 
-
   const inputReset = (e) => {
     e.currentTarget.classList.remove("wrong");
     e.currentTarget.value = "";
@@ -181,7 +193,9 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
       }
     }
 
-    const ImgElem = document.querySelector(`#userinfo-update img.${option === 0 ? "pImg" : "bgImg"}`);
+    const ImgElem = document.querySelector(
+      `#userinfo-update img.${option === 0 ? "pImg" : "bgImg"}`
+    );
     ImgElem.src = "/gif/loading.gif";
     ImgElem.setAttribute("data-ext", fileExtenstion);
 
@@ -202,26 +216,28 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
     document.querySelector(`#userinfo-update input#bgImg`).click();
   };
 
-
   useEffect(() => {
     if (userInfo.skills && userInfo.skills.length > 0) {
       setSkills(userInfo.skills);
     }
   }, [userInfo.skills]);
-  
+
   return (
     <Container className="holder" id="userinfo-update">
       <Form className="form">
         <ImgDiv className="images-container">
           <img
-            src={(userInfo.bg || BACKGROUND_IMG)+"?tr=w-800,h-300,cm-extract,fo-center,q-90"}
+            src={
+              (userInfo.bg || BACKGROUND_IMG) +
+              "?tr=w-800,h-300,cm-extract,fo-center,q-90"
+            }
             alt=""
             className="bgImg"
           />
           <i className="fa-solid fa-pencil edit" onClick={() => openInput(1)} />
           <Profile className="profile">
             <img
-              src={(userInfo.profile || PROFILE_IMG)+"?tr=w-100,w-100"}
+              src={(userInfo.profile || PROFILE_IMG) + "?tr=w-100,w-100"}
               className="pImg"
               alt=""
             />
@@ -253,40 +269,7 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
             />
             {err && <p className="error">{err}</p>}
           </InputDiv>
-          {/* <InputDiv>
-          <div className="skills-container">
-            <h4>Skills:</h4>
-            {skills.length > 0 ? (
-              <input
-                type="text"
-                id="skill-input"
-                placeholder={userInfo.skills}
-                value={newSkill}
-                onChange={(e) => setNewSkill(e.target.value)}
-              />
-            ) : (
-              <input
-                type="text"
-                id="skill-input"
-                placeholder="Add skills"
-                value={newSkill}
-                onChange={(e) => setNewSkill(e.target.value)}
-              />
-            )}
-            <div className="add-remove-buttons">
-              <button className="add-skill-button" onClick={handleAddSkill}>
-                Add Skill
-              </button>
-              <button
-                className="remove-skill-button"
-                onClick={handleRemoveSkill}
-                disabled={skills.length === 0}
-              >
-                Remove Skill
-              </button>
-            </div>
-          </div>
-        </InputDiv> */}
+
           <InputDiv>
             <div className="skills-container">
               <h4>Skills:</h4>
@@ -338,7 +321,11 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
           />
 
           <Save className="save-btn" onClick={saveInfo}>
-            {load ? <img src={LOADING_GIF+"?tr=h-15,w-15"} alt="" /> : <span>Save</span>}
+            {load ? (
+              <img src={LOADING_GIF + "?tr=h-15,w-15"} alt="" />
+            ) : (
+              <span>Save</span>
+            )}
           </Save>
         </TxtDiv>
       </Form>

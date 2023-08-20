@@ -223,7 +223,7 @@ const Register = () => {
             <Divider className="button-divider">or</Divider>
             <GoogleBtn type="submit" onClick={signup}>
               <img src="/images/google.svg" alt="" />
-              <span>Sing in with Google</span>
+              <span>Continue with Google</span>
             </GoogleBtn>
             <p style={{ marginTop: "24px" }}>
               Already a member?{" "}

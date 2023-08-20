@@ -11,6 +11,21 @@ const PostMedia = (props) => {
   const MAX_IMG_DISPLAY = 4; // visible post
   const mediaLength = media?.length;
 
+  // adjust moreImg div with last image size
+  const resizeMoreImg = (e) => {
+    if (mediaLength <= 4) return;
+    try {
+      const Post = document.getElementById(postId);
+      const ImgContainer = Post.querySelector(".media .img-container");
+      const moreImgDiv = ImgContainer.querySelector(".more-img");
+
+      moreImgDiv.style.opacity = "0.7";
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   useEffect(() => {
     // adjust MoreImg Div on every screen size change
     window.addEventListener("resize", () => {
@@ -46,19 +61,6 @@ const PostMedia = (props) => {
     }
   };
 
-  // adjust moreImg div with last image size
-  const resizeMoreImg = (e) => {
-    if (mediaLength <= 4) return;
-    try {
-      const Post = document.getElementById(postId);
-      const ImgContainer = Post.querySelector(".media .img-container");
-      const moreImgDiv = ImgContainer.querySelector(".more-img");
-
-      moreImgDiv.style.opacity = "0.7";
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const imgInViewMode = (e) => {
     // Assuming last displayed image is the 4th one (POSITION from 0)

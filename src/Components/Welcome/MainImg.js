@@ -71,15 +71,15 @@ function MainImg() {
     );
 
     // getting Api responce
-    const data = await response.json();
+    const data = await response?.json();
 
     // if error occured
-    if (!data.success) {
+    if (data?.success === false) {
       setErr(data.error.msg);
       if (data.error.code === 2) {
-        userInput.classList.add("wrong");
+        userInput?.classList.add("wrong");
       } else if (data.error.code === 3) {
-        passInput.classList.add("wrong");
+        passInput?.classList.add("wrong");
       }
       return;
     }

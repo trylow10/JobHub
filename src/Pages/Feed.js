@@ -75,10 +75,10 @@ const Network = () => {
 
   const setInfo = async () => {
     const request = await fetch(`${API}/api/user?token=${userToken}`);
-    const data = await request.json();
+    const data = await request?.json();
     if (!data.success) {
       console.log(data.error);
-      return;
+      return data;
     }
 
     const responce2 = await fetch(`${API}/api/user/all?token=${userToken}`);
@@ -189,16 +189,18 @@ const Feed = () => {
       console.log(data.error);
       return;
     }
-    console.log(data);
+
     setUserInfo({
       uname: data.user.uname,
       headline: data.user.headline || "Hi! I am using linkedin",
       profile: data.user.profileImg,
       bg: data.user.bgImg,
+      skills: data.user.skills,
     });
     dispatch(
       userUpdate({
         info: {
+          skills: data.user.skills,
           uname: data.user.uname,
           headline: data.user.headline || "Hi! I am using linkedin",
           profile: data.user.profileImg,
@@ -216,14 +218,14 @@ const Feed = () => {
     if (window.innerWidth < 530) return;
 
     // scroll-top btn
-    const scrollBtn = document.querySelector(".scroll-top");
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 20) {
-        scrollBtn.classList.add("active-top");
-      } else {
-        scrollBtn.classList.remove("active-top");
-      }
-    });
+    // const scrollBtn = document.querySelector(".scroll-top");
+    // window.addEventListener("scroll", () => {
+    //   if (window.scrollY > 20) {
+    //     scrollBtn.classList.add("active-top");
+    //   } else {
+    //     scrollBtn.classList.remove("active-top");
+    //   }
+    // });
 
     // eslint-disable-next-line
   }, []);
