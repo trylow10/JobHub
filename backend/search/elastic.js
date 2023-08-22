@@ -15,7 +15,9 @@ const auth = {
 
 function initClient() {
   client = new Client({
-    node: ELASTIC_SEARCH_BACKEND,
+    cloud: {
+      id: "linkedin_clone:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJGI4NzkzNTU4MWVmZTQyNTA4OThiYjY1ZWMzZTUyOGZhJDZjNDdhMGQxNDI2NTQxNDU5MTFiNGViMzMwMjAyZmFk",
+    },
     auth,
     requestTimeout: 3000,
     ssl: {
@@ -25,9 +27,9 @@ function initClient() {
 }
 
 const indexSettings = {
-  number_of_shards: 1,
-  number_of_replicas: 1,
   settings: {
+    number_of_shards: 5,
+    number_of_replicas: 1,
     analysis: {
       analyzer: {
         my_analyzer: {

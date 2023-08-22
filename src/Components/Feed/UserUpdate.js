@@ -46,13 +46,6 @@ const UserUpdate = ({ token, userInfo, getUserInfo }) => {
 
     return res.link;
   };
-  // const userInfoForSkill = async () => {
-  //   const user = await fetch(
-  //     `${API}/api/user/info?token=${localStorage.getItem("token")}`
-  //   );
-  //   const userResponse = user?.json();
-  console.log(userInfo, "to get skill");
-  // };
 
   const saveInfo = async () => {
     if (!exit) return;

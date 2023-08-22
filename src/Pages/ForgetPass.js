@@ -123,7 +123,8 @@ const ForgetPass = () => {
               next
             </button>
             <button className="back" onClick={hideUserName}>
-              <i className="fa-regular fa-arrow-left-long"></i>{" "}
+              <i className="far fa-arrow-left"></i>
+              {"back"}
             </button>
           </form>
         )}
