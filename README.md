@@ -55,12 +55,19 @@ JobHub is a cutting-edge platform designed to mirror the features of LinkedIn, l
 Visit [http://localhost:3000](http://localhost:3000) to explore JobHub!
 
 ## Screenshots
-
-<!-- Add images in a loop -->
 <p align="center">
-  {% for i in (1..11) %}
-    <img src="./images/{{ i }}.png" alt="Screenshot {{ i }}" width="400">
-  {% endfor %}
+  <!-- Add your screenshots here -->
+  <img src="./images/1.png" alt="Screenshot 1" width="400">
+  <img src="./images/2.png" alt="Screenshot 2" width="400">
+  <img src="./images/4.png" alt="Screenshot 2" width="400">
+  <img src="./images/5.png" alt="Screenshot 2" width="400">
+  <img src="./images/6.png" alt="Screenshot 2" width="400">
+  <img src="./images/7.png" alt="Screenshot 2" width="400">
+  <img src="./images/8.png" alt="Screenshot 2" width="400">
+  <img src="./images/9.png" alt="Screenshot 2" width="400">
+  <img src="./images/10.png" alt="Screenshot 2" width="400">
+  <img src="./images/11.png" alt="Screenshot 2" width="400">
+  <!-- Add more screenshots as needed -->
 </p>
 
 
