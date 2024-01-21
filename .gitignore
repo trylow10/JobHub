@@ -25,6 +25,5 @@ chrome-user-data
 *.swo
 
 
-public/
 idea/
 .env
