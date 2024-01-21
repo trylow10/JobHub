@@ -31,6 +31,16 @@ JobHub is a cutting-edge platform designed to mirror the features of LinkedIn, l
 
 ## Features
 
+- Register/Login
+- Uploading Posts (maximum of 6 media per post, including gifs)
+- Forgot Password
+- Connecting with people
+- Following people
+- Liking posts
+- Commenting on posts
+- Replying to comments on posts
+- Deleting Posts, comments, and replies
+- Changing UserInfo (Profile Image, Background Img, UserName, Headline)
 - Image management for enhanced user profiles using ImageKit.
 - Advanced search functionality powered by Elasticsearch.
 - Sophisticated matching algorithm utilizing cosine similarity.
