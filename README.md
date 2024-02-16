@@ -49,7 +49,7 @@ JobHub is a cutting-edge platform designed to mirror the features of LinkedIn, l
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/jobhub.git
+   git clone git@github.com:trylow10/jobhub.git
    cd jobhub
    ```
 
@@ -78,15 +78,14 @@ JobHub is a cutting-edge platform designed to mirror the features of LinkedIn, l
 
 6. **Start the frontend and backend servers:**
    ```bash
-   cd frontend
    npm start
    ```
    ```bash
    cd backend
    npm start
    ```
-
-7. **Visit [http://localhost:3000](http://localhost:3000) to explore JobHub!**
+7. **BACKEND STARTS AT [http://localhost:5000](http://localhost:5000)**
+8. **Visit [http://localhost:3000](http://localhost:3000) to explore JobHub!**
 
 ## Screenshot
 <p align="center">
@@ -101,8 +100,6 @@ JobHub is a cutting-edge platform designed to mirror the features of LinkedIn, l
   <img src="./images/9.jpg" alt="Screenshot 1" width="400">
   <img src="./images/10.jpg" alt="Screenshot 1" width="400">
   <img src="./images/11.jpg" alt="Screenshot 1" width="400">
-  <!-- Add more screenshots as needed -->
-
 </p>
 
 Feel free to contribute or report issues. Happy coding!
